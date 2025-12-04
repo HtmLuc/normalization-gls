@@ -28,26 +28,45 @@ set<vector<string>> Grammar::getProductions(string A){
 }
 
 void Grammar::print(ostream &out){
+  bool aux = true;
+  
   out << "Terminais: <";
-  bool first = true;
   for (auto t : terminals) {
-    if (!first) {
+    if (!aux) {
       out << ", ";
     }
-    first = false;
+    aux = false;
     out << t;
   }
-  out << ">\n\n";
+  out << ">\n";
 
-  first = true;
-  out << "Produções:\n";
-  for (auto p : productions) {
-    out << p.first << " -> ";
-    for (auto ps : p.second) {
-      if (!first) {
+  out << "Produções: ";
+  auto startGrammar = productions.find(startSymbol);
+  if (startGrammar != productions.end()) {
+    out << startGrammar->first << " -> ";
+    aux = true;
+    for (auto t : startGrammar->second) {
+      if (!aux) {
         out << " | ";
       }
-      first = false;
+      aux = false;
+      for (auto p : t) {
+        out << p;
+      }
+    }
+    out << "\n";
+  }
+  for (auto p : productions) {
+    if (p.first == startSymbol) {
+      continue;
+    }
+    out << "           " << p.first << " -> ";
+    aux = true;
+    for (auto ps : p.second) {
+      if (!aux) {
+        out << " | ";
+      }
+      aux = false;
       for (auto pss : ps) {
         out << pss;
       }
@@ -55,7 +74,7 @@ void Grammar::print(ostream &out){
     out << "\n";
   }
 
-  out << "\nInicial: " << this->startSymbol << "\n";
+  out << "Inicial:   " << this->startSymbol << "\n";
 }
 
 Grammar Grammar::clone() const {
