@@ -71,6 +71,23 @@ vector<int> getNullablePositionsRHS(const vector<string>& rhs, set<string> voida
   return nullablePositions;
 }
 
+vector<string> generateAuxiliaryRHS(vector<string> rhs, vector<int> nullablePositions, int mask){
+  int k = nullablePositions.size();
+  vector<string> newRhs = rhs;
+
+  for (int bit = 0; bit < k; bit++) {
+    cout << "bit: " << bit << endl;
+    cout << ((mask >> bit) & 1) << endl;
+    if (((mask >> bit) & 1) == 0) {
+      int pos = nullablePositions[bit];
+      cout << "Pos: " << pos << " | nullablePositions[bit]: " << nullablePositions[bit] << " | bit: " << bit << endl;
+      newRhs[pos] = "#REMOVE#";
+    }
+  }
+
+  return newRhs;
+}
+
 Grammar ChomskyNormalizer::removeLambdaProductions(){
   Grammar g = this->grammar.clone();
   cout << "Inicio" << endl;
@@ -88,40 +105,29 @@ Grammar ChomskyNormalizer::removeLambdaProductions(){
          cout << s << " ";
       }
       cout << endl;
-      
+
       vector<int> nullablePositions = getNullablePositionsRHS(rhs, voidableVariables);
-
       int k = nullablePositions.size();
-
       if(k == 0) continue;
 
-      int total = 1 << k; // All possible combinations of nullable variables!!!
+      int total = 1 << k;
+      cout << "Total: " << total << endl;
 
-      for(int mask = 1; mask < total; mask++){
-        vector<string> newRhs = rhs;
-        for (int bit = 0; bit < k; bit++) {
-          cout << "bit: " << bit << endl;
-          if (((mask >> bit) & 1) == 0) {
-            int pos = nullablePositions[bit];
-            cout << "Pos: " << pos << " | nullablePositions[bit]" << nullablePositions[bit] << " | bit: " << bit << endl;
-            newRhs[pos] = "#REMOVE#";
-          }
-        }
-
+      for(int mask = 0; mask < total; mask++){
+        vector<string> newRhs = generateAuxiliaryRHS(rhs, nullablePositions, mask);
         vector<string> cleaned;
+
         for (auto& s : newRhs) {
             if (s != "#REMOVE#")
                 cleaned.push_back(s);
         }
 
         if(cleaned.empty()) continue;
-
         g.addProduction(A, cleaned);
       }
-
-    }
-    
+    }  
   }
+
   for (string A : g.getVariables()) {
       vector<string> lambda = {"&"};
       g.removeProduction(A, lambda);
