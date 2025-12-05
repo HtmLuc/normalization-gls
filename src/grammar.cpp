@@ -83,5 +83,6 @@ Grammar Grammar::clone() const {
   g2.terminals = this->terminals;
   g2.startSymbol = this->startSymbol;
   g2.productions = this->productions;
+  g2.variables = this->variables;
   return g2;
 }
