@@ -9,6 +9,12 @@ void testes_lambda(Grammar& g){
 
     Grammar v2 = normalizer.removeLambdaProductions();
 
+    cout << "\n\n---------------------------------------" << endl;
+
+    cout << "\nGramática sem regras-&:\n";
+
+    v2.print(cout);
+
     cout << "---------------------------------------" << endl;
 }
 
@@ -39,16 +45,16 @@ int main() {
         cout << endl;
     }
 
-    cout << "\nProduções de \"X\" (não existe na gramática):\n";
-    auto prodsX = g.getProductions("X");
-    cout << "  quantidade de produções de X: " << prodsX.size() << endl;
+    // cout << "\nProduções de \"X\" (não existe na gramática):\n";
+    // auto prodsX = g.getProductions("X");
+    // cout << "  quantidade de produções de X: " << prodsX.size() << endl;
 
-    cout << "\nGramática original (para conferir que não mudou):\n";
-    g.print(file);
+    // cout << "\nGramática original (para conferir que não mudou):\n";
+    // g.print(file);
 
     ChomskyNormalizer normalizer(g);
     Grammar v2 = normalizer.removeRecursionAtBeginning();
-    v2.print(cout);
+    //v2.print(cout);
 
     testes_lambda(v2);
 

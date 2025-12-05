@@ -18,6 +18,7 @@ public:
 
     Grammar removeRecursionAtBeginning();
     Grammar removeLambdaProductions();
+    Grammar removeLambdaProductions2();
     set<string> findVoidableVariables();
     Grammar removeUselessSymbols();
     Grammar toChomskyNormalForm();

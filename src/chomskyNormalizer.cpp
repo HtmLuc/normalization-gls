@@ -51,6 +51,26 @@ set<string> ChomskyNormalizer::findVoidableVariables(){
   return voidableVariables;
 }
 
+vector<int> getNullablePositionsRHS(const vector<string>& rhs, set<string> voidableVariables){
+  vector<int> nullablePositions;
+  
+  for(int i = 0; i < (int)rhs.size(); i++){
+    cout << ">>> Componente da producao " << rhs[i] << endl;
+    if(voidableVariables.count(rhs[i])){
+      cout << ">>>> Essa variavel eh anulavel! --> " << rhs[i] << endl;
+      nullablePositions.push_back(i);
+    }
+  }
+  if(nullablePositions.size() > 0){
+    cout << "\nPosicoes anulaveis da producao: " << endl;
+  }
+  for(int pos : nullablePositions){
+    cout << pos << endl;
+  }
+
+  return nullablePositions;
+}
+
 Grammar ChomskyNormalizer::removeLambdaProductions(){
   Grammar g = this->grammar.clone();
   cout << "Inicio" << endl;
@@ -68,29 +88,48 @@ Grammar ChomskyNormalizer::removeLambdaProductions(){
          cout << s << " ";
       }
       cout << endl;
-      vector<int> nullablePositions;
+      
+      vector<int> nullablePositions = getNullablePositionsRHS(rhs, voidableVariables);
 
-      for(int i = 0; i < (int)rhs.size(); i++){
-        cout << ">>> Componente da producao " << rhs[i] << endl;
-        if(voidableVariables.count(rhs[i])){ //o simbolo rhs[i] eh anulavel?
-          cout << ">>>> Essa variavel eh anulavel! --> " << rhs[i] << endl;
-          nullablePositions.push_back(i);
+      int k = nullablePositions.size();
+
+      if(k == 0) continue;
+
+      int total = 1 << k; // All possible combinations of nullable variables!!!
+
+      for(int mask = 1; mask < total; mask++){
+        vector<string> newRhs = rhs;
+        for (int bit = 0; bit < k; bit++) {
+          cout << "bit: " << bit << endl;
+          if (((mask >> bit) & 1) == 0) {
+            int pos = nullablePositions[bit];
+            cout << "Pos: " << pos << " | nullablePositions[bit]" << nullablePositions[bit] << " | bit: " << bit << endl;
+            newRhs[pos] = "#REMOVE#";
+          }
         }
-      }
-      if(nullablePositions.size() > 0){
-        cout << "\nPosicoes anulaveis da producao: " << endl;
-      }
-      for(int pos : nullablePositions){
-        cout << pos << endl;
-      }
 
+        vector<string> cleaned;
+        for (auto& s : newRhs) {
+            if (s != "#REMOVE#")
+                cleaned.push_back(s);
+        }
 
-      if(nullablePositions.empty()){
-        continue;
+        if(cleaned.empty()) continue;
+
+        g.addProduction(A, cleaned);
       }
 
     }
     
+  }
+  for (string A : g.getVariables()) {
+      vector<string> lambda = {"&"};
+      g.removeProduction(A, lambda);
+  }
+
+  string S = g.getStartSymbol();
+  if (voidableVariables.count(S)) {
+      g.addProduction(S, {"&"});
   }
 
   return g;

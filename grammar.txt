@@ -1,6 +1,0 @@
-Terminais: <&, a, b>
-Produções: S -> aSb | ab | b
-           A -> bB
-           B -> & | Cba
-           C -> & | C
-Inicial:   S
