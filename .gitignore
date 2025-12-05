@@ -1,9 +1,7 @@
-.idea/*
-.vscode/*
-
 cmake-build-debug/
 CMakeLists.txt
-
+.idea/*
+.vscode/*
 obj/*.o
-
-bin/main
+bin/main.exe
+grammar.txt
