@@ -86,3 +86,7 @@ Grammar Grammar::clone() const {
   g2.variables = this->variables;
   return g2;
 }
+
+bool Grammar::isVariable(const string& symbol) const {
+    return variables.count(symbol) > 0;
+}
