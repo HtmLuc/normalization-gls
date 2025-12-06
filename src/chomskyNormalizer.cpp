@@ -244,31 +244,39 @@ Grammar ChomskyNormalizer::removeUnitProductions(){
 
 set<string> ChomskyNormalizer::getTerm(){
   Grammar g = this->grammar.clone();
-  set<string> variables = g.getVariables();
+    set<string> variables = g.getVariables();
 
-  set<string> term;
-  bool variableAdded = false;
+    set<string> term;
+    bool changed = true;
 
-  for(string A : variables){
-    for (vector<string> production : g.getProductions(A)) {
-      for(string a : production){
-        if(!g.isVariable(a)){
-          term.insert(A);
-          variableAdded = true;
-          break;
+    while (changed) {
+      changed = false;
+
+    for (const string& A : variables) {
+        if (term.count(A)) continue;
+
+        for (const auto& production : g.getProductions(A)) {
+          bool hasTerminal = false;
+          bool allGood = true;
+
+          for (const auto& symbol : production) {
+            if (!g.isVariable(symbol))
+              hasTerminal = true;
+
+            if (g.isVariable(symbol) && !term.count(symbol))
+              allGood = false;
+          }
+
+          if (hasTerminal && allGood) {
+            term.insert(A);
+            changed = true;
+            break;
+          }
         }
       }
-      if(variableAdded){
-        break;
-      }
     }
-    if(variableAdded){
-      variableAdded = false;
-      continue;
-    }
-  }
 
-  return term;
+    return term;
 }
 
 Grammar ChomskyNormalizer::removeUselessSymbols(){
@@ -287,13 +295,9 @@ Grammar ChomskyNormalizer::removeUselessSymbols(){
   //eliminar todas as variaveis que nao estao em term
   for(string A : variables){
     if(!term.count(A)){
-      for(vector<string> prod : g.getProductions(A)){
-        result.removeProduction(A, prod);
-      }
+      result.removeVariable(A);
     }
   }
 
-
-
-  return g;
+  return result;
 }

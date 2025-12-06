@@ -11,6 +11,42 @@ Grammar::Grammar(string startSymbol, set<string> terminals) {
   this->terminals = terminals;
 }
 
+void Grammar::removeVariable(const string& A) {
+  variables.erase(A);
+
+  productions.erase(A);
+
+  for (auto& pair : productions) {
+    auto& prodSet = pair.second;
+    set<vector<string>> toRemove;
+    set<vector<string>> toAdd;
+
+    for (const auto& rhs : prodSet) {
+      vector<string> newRhs;
+      bool changed = false;
+
+      for (const string& sym : rhs) {
+        if (sym == A) {
+            changed = true;
+        } else {
+            newRhs.push_back(sym);
+        }
+      }
+
+      if (changed) {
+        toRemove.insert(rhs);
+        if (!newRhs.empty()) {
+            toAdd.insert(newRhs);
+        }
+      }
+    }
+    
+    for (const auto& r : toRemove) prodSet.erase(r);
+    for (const auto& r : toAdd)    prodSet.insert(r);
+  }
+}
+
+
 void Grammar::addProduction(string A, vector<string> rhs){
   productions[A].insert(rhs);
   variables.insert(A);
