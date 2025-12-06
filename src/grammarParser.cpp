@@ -3,6 +3,7 @@
 Grammar GrammarParser::parserFromFile(string filename) {
     Grammar grammar;
     vector<string> v;
+    bool complete = false;
     ifstream file;
     file.open(filename);
 
@@ -20,10 +21,25 @@ Grammar GrammarParser::parserFromFile(string filename) {
         ss >> ladoEsquerdo;
         ss >> seta;
 
+        if (ladoEsquerdo == "Inicial") {
+            char c;
+            while (ss.get(c)) {
+                if (c != ' ' && c != '=') {
+                    string st(1, c);
+                    grammar.setStartSymbol(st);
+                }
+            }
+            complete = true;
+        }
+
         if (seta == "->") {
             char c;
             while (ss.get(c)) {
                 if (c != ' ') {
+                    if (!complete) {
+                        grammar.setStartSymbol(ladoEsquerdo);
+                        complete = true;
+                    }
                     v.push_back(string(1, c));
                 }
             }
