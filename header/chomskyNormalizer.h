@@ -24,6 +24,8 @@ public:
     Grammar toChomskyNormalForm();
     set<string> findVariableChain(string& A);
     set<string> findUnitProductionsVar(string& A);
+    Grammar removeLeftRecursion();
+
 
     /*
     na main:

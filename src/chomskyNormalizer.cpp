@@ -241,3 +241,38 @@ Grammar ChomskyNormalizer::removeUnitProductions(){
 
   return result;
 }
+
+Grammar ChomskyNormalizer::removeLeftRecursion(){
+
+  Grammar g = this->grammar.clone();
+
+  for (string A : g.getVariables()){
+
+    set<vector<string>> productionsA = g.getProductions(A);
+
+    for(auto& prod : productionsA){
+
+      for(auto& symbol : prod){
+
+        if(symbol == A){
+            g.removeProduction(A, prod);
+
+            vector<std::string> aux(prod.begin() + 1, prod.end());
+            if (aux.size() != 0) { 
+              g.addProduction(A + "'", aux);
+              vector<std::string> auxA = aux;
+              auxA.push_back(A + "'");
+              g.addProduction(A + "'", auxA);    
+            }
+     
+        }  
+
+        break;         
+
+      }
+    }
+  }
+
+  return g;
+
+}

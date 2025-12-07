@@ -60,9 +60,15 @@ int main() {
     cout << "\nRemovendo recursao inicial: " << endl;
     g2v2.print(cout);
 
-    Grammar g2v3 = normalizer2.removeLambdaProductions();
+    ChomskyNormalizer normalizer2_1(g2v2);
+    Grammar g2v3 = normalizer2_1.removeLambdaProductions();
     cout << "\nRemovendo regras-lambda: " << endl;
     g2v3.print(cout);
+
+    ChomskyNormalizer normalizer2_2(g2v3);
+    Grammar g2v4 = normalizer2_2.removeLeftRecursion();
+    cout << "\nRemovendo recursao à esquerda: " << endl;
+    g2v4.print(cout);
 
     cout << "-------------------------------------------------------------" << endl;
 

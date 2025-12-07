@@ -25,6 +25,9 @@ void Grammar::addProduction(string A, vector<string> rhs)
 void Grammar::removeProduction(string A, vector<string> rhs)
 {
   productions[A].erase(rhs);
+  if (productions[A].empty()) {
+    productions.erase(A);
+  }
 }
 
 set<vector<string>> Grammar::getProductions(string A){
