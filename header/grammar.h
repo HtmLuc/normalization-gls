@@ -24,10 +24,10 @@ public:
     bool isVariable(const string& symbol) const;
     Grammar clone() const;
 
-    set<vector<string>> getProductions(string A);
+    set<vector<string>> getProductions(string A) const;
     string getStartSymbol(){return startSymbol;}
-    set<string> getVariables(){return variables;}
-
+    set<string> getVariables() const {return variables;}
+    
     void setStartSymbol(string A){this->startSymbol = A;}
 };
 

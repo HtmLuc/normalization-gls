@@ -1,6 +1,8 @@
 #include "../header/grammar.h"
 #include "../header/chomskyNormalizer.h"
 #include <string>
+#include <map>
+#include <queue>
 
 using namespace std;
 
@@ -240,4 +242,212 @@ Grammar ChomskyNormalizer::removeUnitProductions(){
   }
 
   return result;
+}
+
+Grammar ChomskyNormalizer::removeLeftRecursion(){
+
+  Grammar g = this->grammar.clone();
+
+  for (string A : g.getVariables()){
+
+    set<vector<string>> productionsA = g.getProductions(A);
+
+    for(auto& prod : productionsA){
+
+      for(auto& symbol : prod){
+
+        if(symbol == A){
+            g.removeProduction(A, prod);
+
+            vector<std::string> aux(prod.begin() + 1, prod.end());
+            if (aux.size() != 0) { 
+              g.addProduction(A + "'", aux);
+              vector<std::string> auxA = aux;
+              auxA.push_back(A + "'");
+              g.addProduction(A + "'", auxA);    
+            }
+     
+        }  
+
+        break;         
+
+      }
+    }
+  }
+
+  return g;
+
+}
+
+Grammar ChomskyNormalizer::removeUselessSymbols() {
+    Grammar g = this->grammar.clone();
+    set<string> generating;
+    bool changed = true;
+
+    // Encontrando variáveis geradoras
+    while(changed) {
+        changed = false;
+        for(const string& var : g.getVariables()) {
+            if(generating.count(var)) continue;
+
+            for(const auto& rhs : g.getProductions(var)) {
+                bool allGen = true;
+                for(const string& sym : rhs) {
+                    if(g.isVariable(sym) && !generating.count(sym)) {
+                        allGen = false;
+                        break;
+                    }
+                }
+                if(allGen) {
+                    generating.insert(var);
+                    changed = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Encontrando variáveis alcançáveis (apenas entre as geradoras)
+    set<string> reachable;
+    string startSymbol = g.getStartSymbol();
+    
+    if(generating.count(startSymbol)) {
+        reachable.insert(startSymbol);
+        queue<string> q;
+        q.push(startSymbol);
+
+        while(!q.empty()) {
+            string curr = q.front();
+            q.pop();
+
+            for(const auto& rhs : g.getProductions(curr)) {
+                bool activeProd = true;
+                for(const string& sym : rhs) {
+                    if(g.isVariable(sym) && !generating.count(sym)) {
+                        activeProd = false; break;
+                    }
+                }
+
+                if(activeProd) {
+                    for(const string& sym : rhs) {
+                        if(g.isVariable(sym) && !reachable.count(sym)) {
+                            reachable.insert(sym);
+                            q.push(sym);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Reconstruido gramática limpa
+    Grammar cleanG;
+    cleanG.setStartSymbol(startSymbol);
+
+    for(const string& var : reachable) {
+        for(const auto& rhs : g.getProductions(var)) {
+            bool valid = true;
+            for(const string& sym : rhs) {
+                if(g.isVariable(sym) && (!generating.count(sym) || !reachable.count(sym))) {
+                    valid = false; break;
+                }
+            }
+            if(valid) cleanG.addProduction(var, rhs);
+        }
+    }
+    return cleanG;
+}
+
+string ChomskyNormalizer::generateNewVarName(const Grammar& context) {
+    string name;
+    do {
+        name = "X" + to_string(newVarCounter++);
+    } while(context.isVariable(name));
+    return name;
+}
+
+Grammar ChomskyNormalizer::replaceTerminalsInLongBodies(const Grammar& gInput) {
+    Grammar g = gInput.clone();
+    map<string, string> termToVar;
+    set<string> vars = g.getVariables();
+
+    for(const string& var : vars) {
+        set<vector<string>> prods = g.getProductions(var);
+        for(const auto& rhs : prods) {
+            if(rhs.size() < 2) continue;
+
+            vector<string> newRhs;
+            bool changed = false;
+
+            for(const string& sym : rhs) {
+                if(!g.isVariable(sym)) {
+                    string tVar;
+                    if(termToVar.count(sym)) {
+                        tVar = termToVar[sym];
+                    } else {
+                        tVar = "T_" + sym;
+                        int suffix = 0;
+                        while(g.isVariable(tVar)) tVar = "T_" + sym + to_string(suffix++);
+                        termToVar[sym] = tVar;
+                        g.addProduction(tVar, {sym});
+                    }
+                    newRhs.push_back(tVar);
+                    changed = true;
+                } else {
+                    newRhs.push_back(sym);
+                }
+            }
+
+            if(changed) {
+                g.removeProduction(var, rhs);
+                g.addProduction(var, newRhs);
+            }
+        }
+    }
+    return g;
+}
+
+Grammar ChomskyNormalizer::breakLongBodies(const Grammar& gInput) {
+    Grammar g = gInput.clone();
+    set<string> vars = g.getVariables();
+
+    for(const string& var : vars) {
+        set<vector<string>> prods = g.getProductions(var);
+        for(const auto& rhs : prods) {
+            if(rhs.size() <= 2) continue;
+
+            g.removeProduction(var, rhs);
+            string currVar = var;
+            
+            for(size_t i = 0; i < rhs.size() - 2; ++i) {
+                string nextVar = generateNewVarName(g);
+                g.addProduction(currVar, {rhs[i], nextVar});
+                currVar = nextVar;
+            }
+            g.addProduction(currVar, {rhs[rhs.size()-2], rhs[rhs.size()-1]});
+        }
+    }
+    return g;
+}
+
+Grammar ChomskyNormalizer::fixLongProductions() {
+    Grammar g1 = replaceTerminalsInLongBodies(this->grammar);
+    ChomskyNormalizer temp(g1);
+    return temp.breakLongBodies(g1);
+}
+
+Grammar ChomskyNormalizer::toChomskyNormalForm() {
+    Grammar g = this->grammar.clone();
+    
+    g = ChomskyNormalizer(g).removeRecursionAtBeginning();
+    g = ChomskyNormalizer(g).removeLambdaProductions();
+    g = ChomskyNormalizer(g).removeUnitProductions();
+    g = ChomskyNormalizer(g).removeUselessSymbols();
+    g = ChomskyNormalizer(g).fixLongProductions();
+
+    return g;
+}
+
+Grammar ChomskyNormalizer::getGrammar() const {
+    return this->grammar;
 }

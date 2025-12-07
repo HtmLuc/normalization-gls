@@ -7,29 +7,35 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <queue>
 #include "grammar.h"
+
+using namespace std;
 
 class ChomskyNormalizer {
 private:
     Grammar grammar;
+    int newVarCounter = 0;
+
+    string generateNewVarName(const Grammar& context);
+    Grammar replaceTerminalsInLongBodies(const Grammar& g);
+    Grammar breakLongBodies(const Grammar& g);
 
 public:
     ChomskyNormalizer(const Grammar& g);
 
     Grammar removeRecursionAtBeginning();
     Grammar removeLambdaProductions();
-    set<string> findVoidableVariables();
     Grammar removeUnitProductions();
+    Grammar removeLeftRecursion();
+    
     Grammar removeUselessSymbols();
+    Grammar fixLongProductions();
     Grammar toChomskyNormalForm();
-    set<string> findVariableChain(string& A);
-    set<string> findUnitProductionsVar(string& A);
 
-    /*
-    na main:
-        ChomskyNormalizer normalizer(G);
-        Grammar fnc = normalizer.toChomskyNormalForm();
-    */
+    set<string> findVoidableVariables();
+    set<string> findUnitProductionsVar(string& A);
+    set<string> findVariableChain(string& A);
 
     Grammar getGrammar() const;
 };

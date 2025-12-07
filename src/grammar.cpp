@@ -18,9 +18,12 @@ void Grammar::addProduction(string A, vector<string> rhs){
 
 void Grammar::removeProduction(string A, vector<string> rhs){
   productions[A].erase(rhs);
+  if (productions[A].empty()) {
+    productions.erase(A);
+  }
 }
 
-set<vector<string>> Grammar::getProductions(string A){
+set<vector<string>> Grammar::getProductions(string A) const {
   auto it = productions.find(A);
   if (it != productions.end()) {
     return it->second;
@@ -53,6 +56,7 @@ void Grammar::print(ostream &out){
       aux = false;
       for (auto p : t) {
         out << p;
+  
       }
     }
     out << "\n";
