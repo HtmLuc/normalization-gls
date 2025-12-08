@@ -16,7 +16,15 @@ void printProducions(Grammar& g){
     cout << endl;
 }
 
+void callFuncions(Grammar g){
+    cout << "Gramática original:\n";
+    g.print(cout);
 
+    ChomskyNormalizer normalizer(g);
+    normalizer.toChomskyNormalForm();
+    cout << "\nFNCl: " << endl;
+    (normalizer.getGrammar()).print(cout);
+}
 
 int main() {
     ofstream file("grammar.txt");
@@ -32,13 +40,7 @@ int main() {
     g.addProduction("C", {"c", "C"});
     g.addProduction("C", {"&"});
 
-    cout << "Gramática original:\n";
-    g.print(cout);
-
-    ChomskyNormalizer normalizer(g);
-    normalizer.toChomskyNormalForm();
-    cout << "\nRemovendo recursao inicial: " << endl;
-    (normalizer.getGrammar()).print(cout);
+    callFuncions(g);
 
     cout << "-------------------------------------------------------------" << endl;
 
@@ -51,8 +53,7 @@ int main() {
     g2.addProduction("C", {"a", "b", "a"});
     g2.addProduction("C", {"&"});
 
-    cout << "Gramática original:\n";
-    g2.print(cout);
+    callFuncions(g2);
 
     cout << "-------------------------------------------------------------" << endl;
 
@@ -67,8 +68,7 @@ int main() {
     g3.addProduction("C", {"b"});
     g3.addProduction("C", {"A"});
 
-    cout << "Gramática original:\n";
-    g3.print(cout);
+    callFuncions(g3);
 
     cout << "-------------------------------------------------------------" << endl;
 
@@ -83,17 +83,7 @@ int main() {
     g4.addProduction("C", {"a", "B", "C"});
     g4.addProduction("C", {"a", "B"});
 
-    cout << "Gramática original:\n";
-    g4.print(cout);
-
-    ChomskyNormalizer normalizer4(g4);
-    normalizer4.removeRecursionAtBeginning();
-    cout << "\nRemovendo recursao inicial: " << endl;
-    (normalizer4.getGrammar()).print(cout);
-
-    normalizer4.removeLambdaProductions();
-    cout << "\nRemovendo regras-lambda: " << endl;
-    (normalizer4.getGrammar()).print(cout);
+    callFuncions(g4);
 
     cout << "-------------------------------------------------------------" << endl;
 
@@ -112,13 +102,7 @@ int main() {
     g5.addProduction("D", {"d", "D"});
     g5.addProduction("D", {"B"});
 
-    cout << "Gramática original:\n";
-    g5.print(cout);
-
-    ChomskyNormalizer normalizer5(g5);
-    normalizer5.removeUnitProductions();
-    cout << "\nRemovendo regras unitarias: " << endl;
-    (normalizer5.getGrammar()).print(cout);
+    callFuncions(g5);
 
     cout << "-------------------------------------------------------------" << endl;
 
@@ -130,13 +114,7 @@ int main() {
     g6.addProduction("C", {"D"});
     g6.addProduction("D", {"d"});
 
-    cout << "Gramática original:\n";
-    g6.print(cout);
-
-    ChomskyNormalizer normalizer6(g6);
-    normalizer6.removeUnitProductions();
-    cout << "\nRemovendo regras unitarias: " << endl;
-    (normalizer6.getGrammar()).print(cout);
+    callFuncions(g6);
 
     cout << "-------------------------------------------------------------" << endl;
 
@@ -159,14 +137,7 @@ int main() {
     g7.addProduction("F", {"b", "B"});
     g7.addProduction("F", {"b"});
 
-    cout << "Gramática original:\n";
-    g7.print(cout);
-
-    ChomskyNormalizer normalizer7(g7);
-    normalizer7.removeUselessSymbols();
-    cout << "\nRemovendo símbolos inúteis: " << endl;
-
-
+    callFuncions(g7);
 
     return 0;
 }

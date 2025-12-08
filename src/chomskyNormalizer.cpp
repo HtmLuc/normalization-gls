@@ -103,7 +103,6 @@ void ChomskyNormalizer::removeLambdaProductions(){
   set<string> variables = (this->grammar).getVariables();
 
   for(string A : (this->grammar).getVariables()){
-    cout << "\n\nVariavel analisada:" << A << endl;
     set<vector<string>> productionsA = (this->grammar).getProductions(A);
 
     for(const vector<string>& rhs : productionsA){
@@ -149,7 +148,6 @@ set<string> ChomskyNormalizer::findUnitProductionsVar(string& A){
       set<string> variables = g.getVariables();
       if(variables.count(rhs[0])){
         unitProductionsA.insert(rhs[0]);
-        //cout << "Producao unitaria de " << A << " : " << rhs[0] << endl;
       }
     }
   }
@@ -287,9 +285,6 @@ set<string> ChomskyNormalizer::getReach() {
         }
       }
     }
-    cout << "reach:\n";
-    for (const string& v : reach)
-        cout << v << endl;
 
     return reach;
 }
@@ -298,36 +293,20 @@ void ChomskyNormalizer::removeUselessSymbols(){
     set<string> variables = (this->grammar).getVariables();
     set<string> term = getTerm();
 
-    cout << "Conjunto Term: " << (int)term.size() << endl;
-    for(string s : term){
-        cout << s << " ";
-    }
-    cout << endl;
-
     for(string A : variables){
         if(!term.count(A)){
-            cout << "removendo variavel: " << A << endl;
             (this->grammar).removeVariable(A);
         }
     }
 
     set<string> reach = getReach();
 
-    cout << "Conjunto Reach: " << (int)reach.size() << endl;
-    for(string s : reach){
-        cout << s << " ";
-    }
-    cout << endl;
-
     set<string> new_variables = (this->grammar).getVariables();
     for(string A : new_variables){
         if(!reach.count(A)){
-            cout << "removendo variavel: " << A << endl;
             (this->grammar).removeVariable(A);
         }
     }
-
-    (this->grammar).print(cout);
 }
 
 void ChomskyNormalizer::toChomskyNormalForm(){
