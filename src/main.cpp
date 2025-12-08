@@ -25,159 +25,169 @@ void callFuncions(Grammar g)
     g.print(cout);
 
     g.toChomskyNormalForm();
-    cout << "\nFNCl: " << endl;
+    cout << "\nFNC: " << endl;
     g.print(cout);
 }
 
 int main()
 {
-    string file;
-    string method;
-    cout << "Nome do arquivo com a gramática: ";
-    cin >> file;
-    string path = "data/" + file;
+    // string file;
+    // string method;
+    // cout << "Nome do arquivo com a gramática: ";
+    // cin >> file;
+    // string path = "data/" + file;
 
-    GrammarParser parser;
-    Grammar grammar = parser.parserFromFile(path);
+    // GrammarParser parser;
+    // Grammar grammar = parser.parserFromFile(path);
 
-    static ofstream stream("result.txt");
-    Logger::setStream(&stream);
+    // static ofstream stream("result.txt");
+    // Logger::setStream(&stream);
 
-    while (true)
-    {
-        cout << "Método de normalização: Greibach ou Chomsky? ";
-        cin >> method;
+    // while (true)
+    // {
+    //     cout << "Método de normalização: Greibach ou Chomsky? ";
+    //     cin >> method;
 
-        if (method.compare("Greibach") == 0 || method.compare("greibach") == 0 || method.compare("g") == 0)
-        {
-            // TODO: add greibach
-            break;
-        }
-        else if (method.compare("Chomksy") == 0 || method.compare("chomksy") == 0 || method.compare("c") == 0)
-        {
-            grammar.print(Logger::log());
-            grammar.toChomskyNormalForm();
-            grammar.print(Logger::log());
-            break;
-        }
-        else
-        {
-            cout << "Normalização não disponível, tente novamente. \n";
-        }
-    }
+    //     if (method.compare("Greibach") == 0 || method.compare("greibach") == 0 || method.compare("g") == 0)
+    //     {
+    //         // TODO: add greibach
+    //         break;
+    //     }
+    //     else if (method.compare("Chomksy") == 0 || method.compare("chomksy") == 0 || method.compare("c") == 0)
+    //     {
+    //         grammar.print(Logger::log());
+    //         grammar.toChomskyNormalForm();
+    //         grammar.print(Logger::log());
+    //         break;
+    //     }
+    //     else
+    //     {
+    //         cout << "Normalização não disponível, tente novamente. \n";
+    //     }
+    // }
 
-    /*
+    
     ofstream file("grammar.txt");
 
     Grammar g("S", {"a", "b", "c"});
 
-    g.addProduction("S", {"S"});
-    g.addProduction("S", {"A", "B", "C"});
-    g.addProduction("A", {"a", "A"});
-    g.addProduction("A", {"&"});
-    g.addProduction("B", {"b", "B"});
-    g.addProduction("B", {"&"});
-    g.addProduction("C", {"c", "C"});
-    g.addProduction("C", {"&"});
+    static ofstream stream("result.txt");
+    Logger::setStream(&stream);
+
+    g.addProduction("S", {"a", "A"});
+    g.addProduction("S", {"b", "C"});
+    g.addProduction("S", {"&"});
+    g.addProduction("A", {"b", "A", "b", "a"});
+    g.addProduction("A", {"b", "a"});
+    g.addProduction("C", {"c", "C", "A", "b", "a"});
+    g.addProduction("C", {"c"});
 
     callFuncions(g);
 
-    cout << "-------------------------------------------------------------" << endl;
+    // g.addProduction("S", {"A", "B", "C"});
+    // g.addProduction("A", {"a", "A"});
+    // g.addProduction("A", {"&"});
+    // g.addProduction("B", {"b", "B"});
+    // g.addProduction("B", {"&"});
+    // g.addProduction("C", {"c", "C"});
+    // g.addProduction("C", {"&"});
 
-    Grammar g2("S", {"a", "b", "c"});
+    // cout << "-------------------------------------------------------------" << endl;
 
-    g2.addProduction("S", {"A", "a", "A"});
-    g2.addProduction("A", {"A", "B", "C"});
-    g2.addProduction("B", {"c", "C"});
-    g2.addProduction("B", {"C", "C"});
-    g2.addProduction("C", {"a", "b", "a"});
-    g2.addProduction("C", {"&"});
+    // Grammar g2("S", {"a", "b", "c"});
 
-    callFuncions(g2);
+    // g2.addProduction("S", {"A", "a", "A"});
+    // g2.addProduction("A", {"A", "B", "C"});
+    // g2.addProduction("B", {"c", "C"});
+    // g2.addProduction("B", {"C", "C"});
+    // g2.addProduction("C", {"a", "b", "a"});
+    // g2.addProduction("C", {"&"});
 
-    cout << "-------------------------------------------------------------" << endl;
+    // callFuncions(g2);
 
-    Grammar g3("S", {"a", "b", "c"});
+    // cout << "-------------------------------------------------------------" << endl;
 
-    g3.addProduction("S", {"a", "B", "C"});
-    g3.addProduction("S", {"B", "a"});
-    g3.addProduction("A", {"a", "A"});
-    g3.addProduction("A", {"&"});
-    g3.addProduction("B", {"A", "C"});
-    g3.addProduction("C", {"c", "A"});
-    g3.addProduction("C", {"b"});
-    g3.addProduction("C", {"A"});
+    // Grammar g3("S", {"a", "b", "c"});
 
-    callFuncions(g3);
+    // g3.addProduction("S", {"a", "B", "C"});
+    // g3.addProduction("S", {"B", "a"});
+    // g3.addProduction("A", {"a", "A"});
+    // g3.addProduction("A", {"&"});
+    // g3.addProduction("B", {"A", "C"});
+    // g3.addProduction("C", {"c", "A"});
+    // g3.addProduction("C", {"b"});
+    // g3.addProduction("C", {"A"});
 
-    cout << "-------------------------------------------------------------" << endl;
+    // callFuncions(g3);
 
-    Grammar g4("S", {"a", "b", "c"});
+    // cout << "-------------------------------------------------------------" << endl;
 
-    g4.addProduction("S", {"a", "A"});
-    g4.addProduction("S", {"b", "A", "B"});
-    g4.addProduction("A", {"a", "b", "c"});
-    g4.addProduction("A", {"&"});
-    g4.addProduction("B", {"A", "c"});
-    g4.addProduction("B", {"A", "A"});
-    g4.addProduction("C", {"a", "B", "C"});
-    g4.addProduction("C", {"a", "B"});
+    // Grammar g4("S", {"a", "b", "c"});
 
-    callFuncions(g4);
+    // g4.addProduction("S", {"a", "A"});
+    // g4.addProduction("S", {"b", "A", "B"});
+    // g4.addProduction("A", {"a", "b", "c"});
+    // g4.addProduction("A", {"&"});
+    // g4.addProduction("B", {"A", "c"});
+    // g4.addProduction("B", {"A", "A"});
+    // g4.addProduction("C", {"a", "B", "C"});
+    // g4.addProduction("C", {"a", "B"});
 
-    cout << "-------------------------------------------------------------" << endl;
+    // callFuncions(g4);
 
-    Grammar g5("S", {"a", "b", "c", "d"});
+    // cout << "-------------------------------------------------------------" << endl;
 
-    g5.addProduction("S", {"a", "S"});
-    g5.addProduction("S", {"b"});
-    g5.addProduction("S", {"A"});
-    g5.addProduction("A", {"a", "A"});
-    g5.addProduction("A", {"a"});
-    g5.addProduction("A", {"C"});
-    g5.addProduction("B", {"a"});
-    g5.addProduction("B", {"b"});
-    g5.addProduction("C", {"c"});
-    g5.addProduction("C", {"B"});
-    g5.addProduction("D", {"d", "D"});
-    g5.addProduction("D", {"B"});
+    // Grammar g5("S", {"a", "b", "c", "d"});
 
-    callFuncions(g5);
+    // g5.addProduction("S", {"a", "S"});
+    // g5.addProduction("S", {"b"});
+    // g5.addProduction("S", {"A"});
+    // g5.addProduction("A", {"a", "A"});
+    // g5.addProduction("A", {"a"});
+    // g5.addProduction("A", {"C"});
+    // g5.addProduction("B", {"a"});
+    // g5.addProduction("B", {"b"});
+    // g5.addProduction("C", {"c"});
+    // g5.addProduction("C", {"B"});
+    // g5.addProduction("D", {"d", "D"});
+    // g5.addProduction("D", {"B"});
 
-    cout << "-------------------------------------------------------------" << endl;
+    // callFuncions(g5);
 
-    Grammar g6("S", {"a", "b", "c", "d"});
+    // cout << "-------------------------------------------------------------" << endl;
 
-    g6.addProduction("S", {"A"});
-    g6.addProduction("A", {"B"});
-    g6.addProduction("B", {"C"});
-    g6.addProduction("C", {"D"});
-    g6.addProduction("D", {"d"});
+    // Grammar g6("S", {"a", "b", "c", "d"});
 
-    callFuncions(g6);
+    // g6.addProduction("S", {"A"});
+    // g6.addProduction("A", {"B"});
+    // g6.addProduction("B", {"C"});
+    // g6.addProduction("C", {"D"});
+    // g6.addProduction("D", {"d"});
 
-    cout << "-------------------------------------------------------------" << endl;
+    // callFuncions(g6);
 
-    Grammar g7("S", {"a", "b", "c"});
+    // cout << "-------------------------------------------------------------" << endl;
 
-    g7.addProduction("S", {"A", "C"});
-    g7.addProduction("S", {"B", "S"});
-    g7.addProduction("S", {"B"});
-    g7.addProduction("A", {"a", "A"});
-    g7.addProduction("A", {"a", "F"});
-    g7.addProduction("B", {"C", "F"});
-    g7.addProduction("B", {"b"});
-    g7.addProduction("C", {"c", "C"});
-    g7.addProduction("C", {"D"});
-    g7.addProduction("D", {"a", "D"});
-    g7.addProduction("D", {"B", "D"});
-    g7.addProduction("D", {"C"});
-    g7.addProduction("E", {"a", "A"});
-    g7.addProduction("E", {"B", "S", "A"});
-    g7.addProduction("F", {"b", "B"});
-    g7.addProduction("F", {"b"});
+    // Grammar g7("S", {"a", "b", "c"});
 
-    callFuncions(g7);
+    // g7.addProduction("S", {"A", "C"});
+    // g7.addProduction("S", {"B", "S"});
+    // g7.addProduction("S", {"B"});
+    // g7.addProduction("A", {"a", "A"});
+    // g7.addProduction("A", {"a", "F"});
+    // g7.addProduction("B", {"C", "F"});
+    // g7.addProduction("B", {"b"});
+    // g7.addProduction("C", {"c", "C"});
+    // g7.addProduction("C", {"D"});
+    // g7.addProduction("D", {"a", "D"});
+    // g7.addProduction("D", {"B", "D"});
+    // g7.addProduction("D", {"C"});
+    // g7.addProduction("E", {"a", "A"});
+    // g7.addProduction("E", {"B", "S", "A"});
+    // g7.addProduction("F", {"b", "B"});
+    // g7.addProduction("F", {"b"});
+
+    // callFuncions(g7);
     return 0;
-    */
+    
 }
