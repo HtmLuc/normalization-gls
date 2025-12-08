@@ -9,22 +9,19 @@ ChomskyNormalizer::ChomskyNormalizer(const Grammar& g) {
   this->grammar = g;
 }
 
-Grammar ChomskyNormalizer::removeRecursionAtBeginning(){
-  Grammar g = this->grammar.clone();
-  string S = g.getStartSymbol();
-  set<vector<string>> productionsS = g.getProductions(S);
+void ChomskyNormalizer::removeRecursionAtBeginning(){
+  string S = (this->grammar).getStartSymbol();
+  set<vector<string>> productionsS = (this->grammar).getProductions(S);
   
   for(auto& prod : productionsS){
       for(auto& symbol : prod){
         if(symbol == S){
-          g.setStartSymbol("S'");
-          g.addProduction("S'", {"S"});
+          (this->grammar).setStartSymbol("S'");
+          (this->grammar).addProduction("S'", {"S"});
           break; 
         }
       }
   }
-
-  return g;
 }
 
 set<string> ChomskyNormalizer::findVoidableVariables(){

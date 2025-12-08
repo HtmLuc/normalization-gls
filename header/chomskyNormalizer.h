@@ -16,8 +16,9 @@ private:
 
 public:
     ChomskyNormalizer(const Grammar &g);
+    Grammar getGrammar(){return this->grammar;}
 
-    Grammar removeRecursionAtBeginning();
+    void removeRecursionAtBeginning();
     Grammar removeLambdaProductions();
     set<string> findVoidableVariables();
     Grammar removeUnitProductions();

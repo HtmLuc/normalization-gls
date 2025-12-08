@@ -32,14 +32,10 @@ int main() {
     cout << "Gramática original:\n";
     g.print(cout);
 
-    ChomskyNormalizer normalizer1(g);
-    Grammar v2 = normalizer1.removeRecursionAtBeginning();
+    ChomskyNormalizer normalizer(g);
+    normalizer.removeRecursionAtBeginning();
     cout << "\nRemovendo recursao inicial: " << endl;
-    v2.print(cout);
-
-    Grammar v3 = normalizer1.removeLambdaProductions();
-    cout << "\nRemovendo regras-lambda: " << endl;
-    v3.print(cout);
+    (normalizer.getGrammar()).print(cout);
 
     cout << "-------------------------------------------------------------" << endl;
 
@@ -54,16 +50,6 @@ int main() {
 
     cout << "Gramática original:\n";
     g2.print(cout);
-
-    ChomskyNormalizer normalizer2(g2);
-    Grammar g2v2 = normalizer2.removeRecursionAtBeginning();
-    cout << "\nRemovendo recursao inicial: " << endl;
-    g2v2.print(cout);
-
-    ChomskyNormalizer normalizer2_1(g2v2);
-    Grammar g2v3 = normalizer2_1.removeLambdaProductions();
-    cout << "\nRemovendo regras-lambda: " << endl;
-    g2v3.print(cout);
 
     cout << "-------------------------------------------------------------" << endl;
 
@@ -80,15 +66,6 @@ int main() {
 
     cout << "Gramática original:\n";
     g3.print(cout);
-
-    ChomskyNormalizer normalizer3(g3);
-    Grammar g3v2 = normalizer3.removeRecursionAtBeginning();
-    cout << "\nRemovendo recursao inicial: " << endl;
-    g3v2.print(cout);
-
-    Grammar g3v3 = normalizer3.removeLambdaProductions();
-    cout << "\nRemovendo regras-lambda: " << endl;
-    g3v3.print(cout);
 
     cout << "-------------------------------------------------------------" << endl;
 
@@ -107,9 +84,9 @@ int main() {
     g4.print(cout);
 
     ChomskyNormalizer normalizer4(g4);
-    Grammar g4v2 = normalizer4.removeRecursionAtBeginning();
+    normalizer4.removeRecursionAtBeginning();
     cout << "\nRemovendo recursao inicial: " << endl;
-    g4v2.print(cout);
+    (normalizer4.getGrammar()).print(cout);
 
     Grammar g4v3 = normalizer4.removeLambdaProductions();
     cout << "\nRemovendo regras-lambda: " << endl;
@@ -185,7 +162,7 @@ int main() {
     ChomskyNormalizer normalizer7(g7);
     normalizer7.removeUselessSymbols();
     cout << "\nRemovendo símbolos inúteis: " << endl;
-    
+
 
 
     return 0;
