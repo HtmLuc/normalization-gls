@@ -226,9 +226,7 @@ Grammar ChomskyNormalizer::removeUnitProductions(){
 set<string> ChomskyNormalizer::getTerm() {
     Grammar g = this->grammar.clone();
     set<string> term;
-    cout << "funcao term" << endl;
 
-    // 1. Adiciona variáveis que geram um terminal diretamente
     for (string A : g.getVariables()) {
         for (auto prod : g.getProductions(A)) {
             bool allTerminals = true;
@@ -244,11 +242,6 @@ set<string> ChomskyNormalizer::getTerm() {
                 break;
             }
         }
-    }
-
-    cout << "primeira iteracao de term" << endl;
-    for(auto& e : term){
-        cout << e << " " << endl;
     }
 
     bool changed = true;
@@ -279,24 +272,27 @@ set<string> ChomskyNormalizer::getTerm() {
 
 
 Grammar ChomskyNormalizer::removeUselessSymbols(){
-  Grammar g = this->grammar.clone();
-  Grammar result = this->grammar.clone();
-  set<string> term = getTerm();
-  set <string> notTerm;
+    Grammar g = this->grammar.clone();
+    Grammar result = this->grammar.clone();
+    set<string> term = getTerm();
+    set <string> notTerm;
 
-  cout << "term: " << (int)term.size() << endl;
-  for(string s : term){
-    cout << s << endl;
-  }
-
-  set<string> variables = g.getVariables();
-
-  //eliminar todas as variaveis que nao estao em term
-  for(string A : variables){
-    if(!term.count(A)){
-      result.removeVariable(A);
+    cout << "term: " << (int)term.size() << endl;
+    for(string s : term){
+        cout << s << " ";
     }
-  }
+    cout << endl;
+
+    set<string> variables = g.getVariables();
+
+    for(string A : variables){
+        if(!term.count(A)){
+            cout << "removendo variavel: " << A << endl;
+            result.removeVariable(A);
+        }
+    }
+
+    result.print(cout);
 
   return result;
 }
