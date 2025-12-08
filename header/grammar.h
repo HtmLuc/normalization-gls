@@ -19,16 +19,6 @@ private:
     string startSymbol;
     map<string, set<vector<string>>> productions;
 
-    // CHOMKSY
-    Grammar removeRecursionAtBeginning();
-    Grammar removeLambdaProductions();
-    set<string> findVoidableVariables();
-    Grammar removeUnitProductions();
-    Grammar removeUselessSymbols();
-    set<string> findVariableChain(string &A);
-    set<string> findUnitProductionsVar(string &A);
-    set<string> getTerm();
-
     // GREIBACH
     void renameVariables();
     bool respectGreibachOrder();
@@ -49,6 +39,16 @@ public:
     bool isVariable(const string &symbol) const;
     void removeVariable(const string &A);
     Grammar clone() const;
+    // CHOMKSY - TEMPORÁRIO, depois que fizer o método toChomksyNormalForm aí tem que mover cada um desses métodos
+    // para o bloco privado.
+    Grammar removeRecursionAtBeginning();
+    Grammar removeLambdaProductions();
+    set<string> findVoidableVariables();
+    Grammar removeUnitProductions();
+    Grammar removeUselessSymbols();
+    set<string> findVariableChain(string &A);
+    set<string> findUnitProductionsVar(string &A);
+    set<string> getTerm();
     void toChomskyNormalForm();
     void toGreibachNormalForm();
 

@@ -1,5 +1,6 @@
 #include "../header/grammar.h"
 #include "../header/logger.h"
+#include "../header/utils.h"
 
 Grammar::Grammar()
 {
@@ -170,18 +171,322 @@ bool Grammar::isVariable(const string &symbol) const
     return variables.count(symbol) > 0;
 }
 
-/* SEÇÃO DE GREIBACH */
-
-vector<string> getSortedVariables(const unordered_map<string, int> &map)
+/* CHOMKSY SECTION */
+Grammar Grammar::removeRecursionAtBeginning()
 {
-    vector<string> sortedVariables(map.size());
-    for (auto [val, idx] : map)
+    Grammar g = this->clone();
+    string S = g.getStartSymbol();
+    set<vector<string>> productionsS = g.getProductions(S);
+
+    for (auto &prod : productionsS)
     {
-        sortedVariables[idx - 1] = val;
+        for (auto &symbol : prod)
+        {
+            if (symbol == S)
+            {
+                g.setStartSymbol("S'");
+                g.addProduction("S'", {"S"});
+                break;
+            }
+        }
     }
 
-    return sortedVariables;
+    return g;
 }
+
+set<string> Grammar::findVoidableVariables()
+{
+    Grammar g = this->clone();
+    set<string> voidableVariables;
+    bool changed = true;
+
+    for (string variable : g.getVariables())
+    {
+        for (vector<string> production : g.getProductions(variable))
+        {
+            if (production.size() == 1)
+            {
+                if (production[0] == "&")
+                {
+                    voidableVariables.insert(variable);
+                    break;
+                }
+            }
+        }
+    }
+
+    while (changed)
+    {
+        changed = false;
+
+        for (const string &A : g.getVariables())
+        {
+            if (voidableVariables.count(A))
+                continue; // já é anulável
+
+            for (const vector<string> &rhs : g.getProductions(A))
+            {
+                bool allNullable = true;
+
+                for (const string &symbol : rhs)
+                {
+                    if ((g.getVariables().count(symbol) == 0) && symbol != "&")
+                    {
+                        allNullable = false;
+                        break;
+                    }
+                    if (!voidableVariables.count(symbol))
+                    {
+                        allNullable = false;
+                        break;
+                    }
+                }
+
+                if (allNullable)
+                {
+                    voidableVariables.insert(A);
+                    changed = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    return voidableVariables;
+}
+
+Grammar Grammar::removeLambdaProductions()
+{
+    Grammar g = this->clone();
+    // cout << "Inicio" << endl;
+
+    set<string> voidableVariables = findVoidableVariables();
+    set<string> variables = g.getVariables();
+
+    for (string A : g.getVariables())
+    {
+        // cout << "\n\nVariavel analisada:" << A << endl;
+        set<vector<string>> productionsA = g.getProductions(A);
+
+        for (const vector<string> &rhs : productionsA)
+        {
+            // cout << "Producao " << A << " --> ";
+            // for(string s : rhs){
+            //    cout << s << " ";
+            // }
+            // cout << endl;
+
+            vector<int> nullablePositions = getNullablePositionsRHS(rhs, voidableVariables);
+            int k = nullablePositions.size();
+            if (k == 0)
+                continue;
+
+            int total = 1 << k;
+            // cout << "Total: " << total << endl;
+
+            for (int mask = 0; mask < total; mask++)
+            {
+                vector<string> newRhs = generateAuxiliaryRHS(rhs, nullablePositions, mask);
+                vector<string> cleaned;
+
+                for (auto &s : newRhs)
+                {
+                    if (s != "#REMOVE#")
+                        cleaned.push_back(s);
+                }
+
+                if (cleaned.empty())
+                    continue;
+                g.addProduction(A, cleaned);
+            }
+        }
+    }
+
+    for (string A : g.getVariables())
+    {
+        vector<string> lambda = {"&"};
+        g.removeProduction(A, lambda);
+    }
+
+    string S = g.getStartSymbol();
+    if (voidableVariables.count(S))
+    {
+        g.addProduction(S, {"&"});
+    }
+
+    return g;
+}
+
+set<string> Grammar::findUnitProductionsVar(string &A)
+{
+    Grammar g = this->clone();
+    set<vector<string>> productionsA = g.getProductions(A);
+    set<string> unitProductionsA;
+
+    for (vector<string> rhs : productionsA)
+    {
+        if ((int)rhs.size() == 1)
+        {
+            set<string> variables = g.getVariables();
+            if (variables.count(rhs[0]))
+            {
+                unitProductionsA.insert(rhs[0]);
+                // cout << "Producao unitaria de " << A << " : " << rhs[0] << endl;
+            }
+        }
+    }
+
+    return unitProductionsA;
+}
+
+set<string> Grammar::findVariableChain(string &A)
+{
+    set<string> chainA = {A};
+    set<string> prev;
+
+    do
+    {
+        set<string> newVars;
+        for (string v : chainA)
+        {
+            if (!prev.count(v))
+            {
+                newVars.insert(v);
+            }
+        }
+        prev = chainA;
+        for (string B : newVars)
+        {
+            set<string> unitProductionsB = findUnitProductionsVar(B);
+            for (string unitProd : unitProductionsB)
+            {
+                chainA.insert(unitProd);
+            }
+        }
+    } while (chainA != prev);
+
+    return chainA;
+}
+
+Grammar Grammar::removeUnitProductions()
+{
+    Grammar g = this->clone();
+    Grammar result = this->clone();
+    set<string> variables = g.getVariables();
+
+    for (string A : variables)
+    {
+        set<string> unitProductionsA = findUnitProductionsVar(A);
+        if ((int)unitProductionsA.size() == 0)
+        {
+            continue;
+        }
+        // add new productions
+        set<string> chainA = findVariableChain(A);
+
+        for (string B : chainA)
+        {
+            for (vector<string> production : g.getProductions(B))
+            {
+                if (!(production.size() == 1 && g.isVariable(production[0])))
+                {
+                    result.addProduction(A, production);
+                }
+            }
+        }
+    }
+    // remove unit productions
+    for (string A : variables)
+    {
+        vector<vector<string>> toRemove;
+        for (auto prod : result.getProductions(A))
+        {
+            if (prod.size() == 1 && result.isVariable(prod[0]))
+            {
+                toRemove.push_back(prod);
+            }
+        }
+        for (auto prod : toRemove)
+        {
+            result.removeProduction(A, prod);
+        }
+    }
+
+    return result;
+}
+
+set<string> Grammar::getTerm()
+{
+    Grammar g = this->clone();
+    set<string> variables = g.getVariables();
+
+    set<string> term;
+    bool changed = true;
+
+    while (changed)
+    {
+        changed = false;
+
+        for (const string &A : variables)
+        {
+            if (term.count(A))
+                continue;
+
+            for (const auto &production : g.getProductions(A))
+            {
+                bool hasTerminal = false;
+                bool allGood = true;
+
+                for (const auto &symbol : production)
+                {
+                    if (!g.isVariable(symbol))
+                        hasTerminal = true;
+
+                    if (g.isVariable(symbol) && !term.count(symbol))
+                        allGood = false;
+                }
+
+                if (hasTerminal && allGood)
+                {
+                    term.insert(A);
+                    changed = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    return term;
+}
+
+Grammar Grammar::removeUselessSymbols()
+{
+    Grammar g = this->clone();
+    Grammar result = this->clone();
+    set<string> term = getTerm();
+    set<string> notTerm;
+
+    cout << "term: " << (int)term.size() << endl;
+    for (string s : term)
+    {
+        cout << s << endl;
+    }
+
+    set<string> variables = g.getVariables();
+
+    // eliminar todas as variaveis que nao estao em term
+    for (string A : variables)
+    {
+        if (!term.count(A))
+        {
+            result.removeVariable(A);
+        }
+    }
+
+    return result;
+}
+
+/* SEÇÃO DE GREIBACH */
 
 void Grammar::renameVariables()
 {
