@@ -7,6 +7,54 @@ using namespace std;
 
 /* CHOMKSY SECTION */
 
+void Grammar::fixLongProductions() {
+    vector<pair<string, vector<string>>> toRemove;
+    vector<pair<string, vector<string>>> toAdd;
+
+    int idx = 1;
+
+    for (auto A : this->getVariables())
+    {
+        for (auto prod : this->getProductions(A))
+        {
+            if (prod.size() <= 2) continue;
+
+            toRemove.push_back({A, prod});
+
+            string new_lhs = "M_";
+            string suffix = to_string(idx);
+            new_lhs.append(suffix);
+            idx++;
+
+            vector<string> rhs = { prod[0], new_lhs };
+            toAdd.push_back({A, rhs});
+
+            for (int i = 0; i < prod.size() - 2; i++ )
+            {
+                string next_lhs = "M_";
+                suffix = to_string(idx);
+                next_lhs.append(suffix);
+                idx++;
+
+                rhs = { prod[i + 1], next_lhs };
+                toAdd.push_back({next_lhs, rhs});
+            }
+
+            rhs = { prod[prod.size() - 2], prod.back() };
+            toAdd.push_back({new_lhs, rhs});
+        }
+    }
+    for (auto& rm : toRemove)
+    {
+        this->removeProduction(rm.first, rm.second);
+    }
+
+    for (auto& add : toAdd)
+    {
+        this->addProduction(add.first, add.second);
+    }
+}
+
 void Grammar::removeMixedProductions()
 {
     map<string, string> newVariables;
@@ -396,8 +444,8 @@ void Grammar::toChomskyNormalForm()
 {
     removeRecursionAtBeginning();
     removeLambdaProductions();
-    removeUnitProductions();
     removeMixedProductions();
     removeUselessSymbols();
-    // fixLongProductions();
+    removeUnitProductions();
+    fixLongProductions();
 }

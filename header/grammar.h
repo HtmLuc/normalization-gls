@@ -29,6 +29,7 @@ private:
 
     /// @brief Remove todas as produções que intercalam terminais e variáveis, i.e. S -> aBa,
     /// adicionando estados para cada variável.
+    void fixLongProductions();
     void removeMixedProductions();
     void removeRecursionAtBeginning();
     set<string> findVoidableVariables();
