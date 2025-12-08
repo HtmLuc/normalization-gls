@@ -16,6 +16,8 @@ void printProducions(Grammar& g){
     cout << endl;
 }
 
+
+
 int main() {
     ofstream file("grammar.txt");
 
@@ -34,7 +36,7 @@ int main() {
     g.print(cout);
 
     ChomskyNormalizer normalizer(g);
-    normalizer.removeRecursionAtBeginning();
+    normalizer.toChomskyNormalForm();
     cout << "\nRemovendo recursao inicial: " << endl;
     (normalizer.getGrammar()).print(cout);
 

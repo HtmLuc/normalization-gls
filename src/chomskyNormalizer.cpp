@@ -329,3 +329,11 @@ void ChomskyNormalizer::removeUselessSymbols(){
 
     (this->grammar).print(cout);
 }
+
+void ChomskyNormalizer::toChomskyNormalForm(){
+  removeRecursionAtBeginning();
+  removeLambdaProductions();
+  removeUnitProductions();
+  removeUselessSymbols();
+  //fixLongProductions();
+}

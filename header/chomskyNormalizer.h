@@ -21,10 +21,12 @@ public:
 
     void removeRecursionAtBeginning();
     void removeLambdaProductions();
-    set<string> findVoidableVariables();
     void removeUnitProductions();
     void removeUselessSymbols();
-    Grammar toChomskyNormalForm();
+    void toChomskyNormalForm();
+
+    //auxiliary:
+    set<string> findVoidableVariables();
     set<string> findVariableChain(string& A);
     set<string> findUnitProductionsVar(string& A);
     set<string> getTerm();
