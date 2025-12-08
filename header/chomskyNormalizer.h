@@ -19,7 +19,7 @@ public:
     Grammar getGrammar(){return this->grammar;}
 
     void removeRecursionAtBeginning();
-    Grammar removeLambdaProductions();
+    void removeLambdaProductions();
     set<string> findVoidableVariables();
     Grammar removeUnitProductions();
     void removeUselessSymbols();

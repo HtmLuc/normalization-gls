@@ -21,6 +21,7 @@ int main() {
 
     Grammar g("S", { "a", "b"});
 
+    g.addProduction("S", {"S"});
     g.addProduction("S", {"A", "B", "C"});
     g.addProduction("A", {"a", "A"});
     g.addProduction("A", {"&"});
@@ -88,9 +89,9 @@ int main() {
     cout << "\nRemovendo recursao inicial: " << endl;
     (normalizer4.getGrammar()).print(cout);
 
-    Grammar g4v3 = normalizer4.removeLambdaProductions();
+    normalizer4.removeLambdaProductions();
     cout << "\nRemovendo regras-lambda: " << endl;
-    g4v3.print(cout);
+    (normalizer4.getGrammar()).print(cout);
 
     cout << "-------------------------------------------------------------" << endl;
 

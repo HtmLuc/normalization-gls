@@ -98,15 +98,13 @@ vector<string> generateAuxiliaryRHS(vector<string> rhs, vector<int> nullablePosi
   return newRhs;
 }
 
-Grammar ChomskyNormalizer::removeLambdaProductions(){
-  Grammar g = this->grammar.clone();
-
+void ChomskyNormalizer::removeLambdaProductions(){
   set<string> voidableVariables = findVoidableVariables();
-  set<string> variables = g.getVariables();
+  set<string> variables = (this->grammar).getVariables();
 
-  for(string A : g.getVariables()){
+  for(string A : (this->grammar).getVariables()){
     cout << "\n\nVariavel analisada:" << A << endl;
-    set<vector<string>> productionsA = g.getProductions(A);
+    set<vector<string>> productionsA = (this->grammar).getProductions(A);
 
     for(const vector<string>& rhs : productionsA){
       vector<int> nullablePositions = getNullablePositionsRHS(rhs, voidableVariables);
@@ -125,22 +123,20 @@ Grammar ChomskyNormalizer::removeLambdaProductions(){
         }
 
         if(cleaned.empty()) continue;
-        g.addProduction(A, cleaned);
+        (this->grammar).addProduction(A, cleaned);
       }
     }  
   }
 
-  for (string A : g.getVariables()) {
+  for (string A : (this->grammar).getVariables()) {
       vector<string> lambda = {"&"};
-      g.removeProduction(A, lambda);
+      (this->grammar).removeProduction(A, lambda);
   }
 
-  string S = g.getStartSymbol();
+  string S = (this->grammar).getStartSymbol();
   if (voidableVariables.count(S)) {
-      g.addProduction(S, {"&"});
+      (this->grammar).addProduction(S, {"&"});
   }
-
-  return g;
 }
 
 set<string> ChomskyNormalizer::findUnitProductionsVar(string& A){
