@@ -11,19 +11,32 @@ Grammar::Grammar(string startSymbol, set<string> terminals) {
   this->terminals = terminals;
 }
 
-void Grammar::addProduction(string A, vector<string> rhs){
-  productions[A].insert(rhs);
+void Grammar::addVariable(string A)
+{
   variables.insert(A);
 }
 
-void Grammar::removeProduction(string A, vector<string> rhs){
+void Grammar::addProduction(string A, vector<string> rhs)
+{
+  productions[A].insert(rhs);
+  this->addVariable(A);
+}
+
+void Grammar::removeProduction(string A, vector<string> rhs)
+{
   productions[A].erase(rhs);
   if (productions[A].empty()) {
     productions.erase(A);
   }
 }
 
-set<vector<string>> Grammar::getProductions(string A){
+void Grammar::clearProductions(string A)
+{
+  productions.erase(A);
+}
+
+set<vector<string>> Grammar::getProductions(string A)
+{
   auto it = productions.find(A);
   if (it != productions.end()) {
     return it->second;

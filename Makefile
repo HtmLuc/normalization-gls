@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -pedantic -Iclass -Iheader
+CFLAGS = -g -Wall -Wextra -pedantic -Iclass -Iheader
 SOURCES = $(wildcard src/*.cpp)
 OBJECTS = $(patsubst src/%.cpp,obj/%.o,$(SOURCES))
 EXECUTABLE = bin/main
