@@ -65,11 +65,6 @@ int main() {
     cout << "\nRemovendo regras-lambda: " << endl;
     g2v3.print(cout);
 
-    ChomskyNormalizer normalizer2_2(g2v3);
-    Grammar g2v4 = normalizer2_2.removeLeftRecursion();
-    cout << "\nRemovendo recursao à esquerda: " << endl;
-    g2v4.print(cout);
-
     cout << "-------------------------------------------------------------" << endl;
 
     Grammar g3("S", { "a", "b", "c"});
