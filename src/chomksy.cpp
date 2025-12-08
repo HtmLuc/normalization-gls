@@ -5,8 +5,6 @@
 
 using namespace std;
 
-/* CHOMKSY SECTION */
-
 void Grammar::fixLongProductions() {
     vector<pair<string, vector<string>>> toRemove;
     vector<pair<string, vector<string>>> toAdd;
