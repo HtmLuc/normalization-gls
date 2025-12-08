@@ -17,6 +17,18 @@ inline vector<string> getSortedVariables(const unordered_map<string, int> &map)
     return sortedVariables;
 }
 
+inline bool productionContainsTerminal(const vector<string> &rhs, const set<string> &terminals)
+{
+    for (auto sym : rhs)
+    {
+        if (terminals.count(sym) == 1)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 inline vector<int> getNullablePositionsRHS(const vector<string> &rhs, set<string> voidableVariables)
 {
     vector<int> nullablePositions;

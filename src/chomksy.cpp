@@ -7,6 +7,56 @@ using namespace std;
 
 /* CHOMKSY SECTION */
 
+void Grammar::removeMixedProductions()
+{
+    map<string, string> newVariables;
+    set<pair<string, vector<string>>> toRemove;
+    set<pair<string, vector<string>>> toAdd;
+
+    int idx = 1;
+    for (auto sym : this->getTerminals())
+    {
+        string new_lhs = "T_";
+        string suffix = to_string(idx);
+
+        new_lhs.append(suffix);
+        idx++;
+
+        this->addProduction(new_lhs, {sym});
+        newVariables[sym] = new_lhs;
+    }
+
+    for (auto var : this->getVariables())
+    {
+        for (auto prod : this->getProductions(var))
+        {
+            if (prod.size() > 1 && productionContainsTerminal(prod, this->getTerminals()))
+            {
+                toRemove.insert({var, prod});
+
+                vector<string> newProd = prod;
+                for (auto &sym : newProd)
+                {
+                    if (!this->isVariable(sym))
+                    {
+                        sym = newVariables[sym]; // Substitui a por Ta, por ex.
+                    }
+                }
+                toAdd.insert({var, newProd});
+            }
+        }
+    }
+
+    for (auto rm : toRemove)
+    {
+        this->removeProduction(rm.first, rm.second);
+    }
+    for (auto add : toAdd)
+    {
+        this->addProduction(add.first, add.second);
+    }
+}
+
 void Grammar::removeRecursionAtBeginning()
 {
     string S = this->getStartSymbol();

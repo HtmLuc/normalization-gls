@@ -27,7 +27,9 @@ private:
     void applyRuleOrderConstraint();
     void removeLeftRecursionGreibach(string lhs);
 
-    // CHOMKSY
+    /// @brief Remove todas as produções que intercalam terminais e variáveis, i.e. S -> aBa,
+    /// adicionando estados para cada variável.
+    void removeMixedProductions();
     void removeRecursionAtBeginning();
     set<string> findVoidableVariables();
     void removeLambdaProductions();
@@ -42,6 +44,7 @@ public:
     Grammar();
     Grammar(string startSymbol, set<string> terminals);
 
+    // TODO: ao final mover tudo pra privado e expor somente print, clone e as normalizações pra cada formato.
     void addVariable(string A);
     void addProduction(string A, vector<string> rhs);
     void removeProduction(string A, vector<string> rhs);
