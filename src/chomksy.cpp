@@ -266,12 +266,6 @@ set<string> Grammar::findUnitProductionsVar(string &A)
         }
     }
 
-    Logger::log() << "Produções unitárias de " << A << ": ";
-    for(string s : unitProductionsA){
-        Logger::log() << s << " ";
-    }
-    Logger::log() << ".\n";
-
     return unitProductionsA;
 }
 
@@ -446,7 +440,7 @@ set<string> Grammar::getReach()
         }
     }
 
-    Logger::log() << "Variáveis alcançáveis a partir da variável inicial: " << ".\n";
+    Logger::log() << "Variáveis alcançáveis a partir da variável inicial: ";
     for(string s : reach){
         Logger::log() << s << " ";
     }
@@ -486,8 +480,8 @@ void Grammar::toChomskyNormalForm()
 {
     removeRecursionAtBeginning();
     removeLambdaProductions();
-    //removeMixedProductions();
-    removeUselessSymbols();
     removeUnitProductions();
-    //fixLongProductions();
+    removeUselessSymbols();
+    removeMixedProductions();
+    fixLongProductions();
 }
