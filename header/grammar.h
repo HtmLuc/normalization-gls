@@ -46,6 +46,7 @@ public:
     Grammar(string startSymbol, set<string> terminals);
 
     // TODO: ao final mover tudo pra privado e expor somente print, clone e as normalizações pra cada formato.
+    void addTerminal(string a) { this->terminals.insert(a); }
     void addVariable(string A);
     void addProduction(string A, vector<string> rhs);
     void removeProduction(string A, vector<string> rhs);

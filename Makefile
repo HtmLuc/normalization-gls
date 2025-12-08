@@ -26,4 +26,4 @@ run: $(EXECUTABLE)
 
 .PHONY: clean
 clean:
-	@$(DELETE) $(OBJECTS) $(EXECUTABLE) $(FILES)
+	@$(DELETE) $(OBJECTS) $(EXECUTABLE) 
