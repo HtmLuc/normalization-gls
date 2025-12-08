@@ -21,11 +21,12 @@ public:
     Grammar removeLambdaProductions();
     set<string> findVoidableVariables();
     Grammar removeUnitProductions();
-    Grammar removeUselessSymbols();
+    void removeUselessSymbols();
     Grammar toChomskyNormalForm();
     set<string> findVariableChain(string& A);
     set<string> findUnitProductionsVar(string& A);
     set<string> getTerm();
+    set<string> getReach();
 
     /*
     na main:

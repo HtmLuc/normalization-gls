@@ -183,9 +183,9 @@ int main() {
     g7.print(cout);
 
     ChomskyNormalizer normalizer7(g7);
-    Grammar g7v2 = normalizer7.removeUselessSymbols();
-    cout << "\nRemovendo rsímbolos inúteis: " << endl;
-    g7v2.print(cout);
+    normalizer7.removeUselessSymbols();
+    cout << "\nRemovendo símbolos inúteis: " << endl;
+    
 
 
     return 0;

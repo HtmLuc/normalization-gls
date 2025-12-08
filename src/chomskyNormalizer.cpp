@@ -1,6 +1,7 @@
 #include "../header/grammar.h"
 #include "../header/chomskyNormalizer.h"
 #include <string>
+#include <queue>
 
 using namespace std;
 
@@ -270,29 +271,68 @@ set<string> ChomskyNormalizer::getTerm() {
     return term;
 }
 
-
-Grammar ChomskyNormalizer::removeUselessSymbols(){
+set<string> ChomskyNormalizer::getReach() {
     Grammar g = this->grammar.clone();
-    Grammar result = this->grammar.clone();
-    set<string> term = getTerm();
-    set <string> notTerm;
+    string start = g.getStartSymbol();
 
-    cout << "term: " << (int)term.size() << endl;
+    set<string> reach;
+    queue<string> q;             
+
+    reach.insert(start);
+    q.push(start);
+
+    while (!q.empty()) {
+      string A = q.front();
+      q.pop();
+
+      for (const auto& prod : g.getProductions(A)) {
+        for (const string& symbol : prod) {
+          if (g.isVariable(symbol) && !reach.count(symbol)) {
+            reach.insert(symbol);
+            q.push(symbol);
+          }
+        }
+      }
+    }
+    cout << "reach:\n";
+    for (const string& v : reach)
+        cout << v << endl;
+
+    return reach;
+}
+
+void ChomskyNormalizer::removeUselessSymbols(){
+    set<string> variables = (this->grammar).getVariables();
+    set<string> term = getTerm();
+
+    cout << "Conjunto Term: " << (int)term.size() << endl;
     for(string s : term){
         cout << s << " ";
     }
     cout << endl;
 
-    set<string> variables = g.getVariables();
-
     for(string A : variables){
         if(!term.count(A)){
             cout << "removendo variavel: " << A << endl;
-            result.removeVariable(A);
+            (this->grammar).removeVariable(A);
         }
     }
 
-    result.print(cout);
+    set<string> reach = getReach();
 
-  return result;
+    cout << "Conjunto Reach: " << (int)reach.size() << endl;
+    for(string s : reach){
+        cout << s << " ";
+    }
+    cout << endl;
+
+    set<string> new_variables = (this->grammar).getVariables();
+    for(string A : new_variables){
+        if(!reach.count(A)){
+            cout << "removendo variavel: " << A << endl;
+            (this->grammar).removeVariable(A);
+        }
+    }
+
+    (this->grammar).print(cout);
 }
