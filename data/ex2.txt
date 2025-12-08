@@ -1,0 +1,17 @@
+S -> aAb
+S -> bAa
+S -> B
+S -> aS
+A -> bB
+A -> &
+B -> cBc
+B -> Ba
+B -> aB
+B -> D
+C -> a
+C -> b
+C -> c
+D -> aDC
+E -> BB
+E -> F
+F -> FEB
