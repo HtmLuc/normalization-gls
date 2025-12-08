@@ -35,8 +35,6 @@ public:
         ChomskyNormalizer normalizer(G);
         Grammar fnc = normalizer.toChomskyNormalForm();
     */
-
-    Grammar getGrammar() const;
 };
 
 #endif
