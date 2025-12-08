@@ -1,0 +1,14 @@
+
+S -> abcd
+S -> aS
+S -> b
+S -> A
+A -> aA
+A -> a
+A -> C
+B -> a
+B -> b
+C -> c
+C -> B
+D -> dD
+D -> B
