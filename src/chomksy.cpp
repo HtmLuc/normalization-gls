@@ -5,8 +5,6 @@
 
 using namespace std;
 
-/* CHOMKSY SECTION */
-
 void Grammar::removeMixedProductions()
 {
     map<string, string> newVariables;
@@ -78,13 +76,12 @@ void Grammar::removeRecursionAtBeginning()
 
 set<string> Grammar::findVoidableVariables()
 {
-    Grammar g = this->clone();
     set<string> voidableVariables;
     bool changed = true;
 
-    for (string variable : g.getVariables())
+    for (string variable : this->getVariables())
     {
-        for (vector<string> production : g.getProductions(variable))
+        for (vector<string> production : this->getProductions(variable))
         {
             if (production.size() == 1)
             {
@@ -101,18 +98,18 @@ set<string> Grammar::findVoidableVariables()
     {
         changed = false;
 
-        for (const string &A : g.getVariables())
+        for (const string &A : this->getVariables())
         {
             if (voidableVariables.count(A))
                 continue; // já é anulável
 
-            for (const vector<string> &rhs : g.getProductions(A))
+            for (const vector<string> &rhs : this->getProductions(A))
             {
                 bool allNullable = true;
 
                 for (const string &symbol : rhs)
                 {
-                    if ((g.getVariables().count(symbol) == 0) && symbol != "&")
+                    if ((this->getVariables().count(symbol) == 0) && symbol != "&")
                     {
                         allNullable = false;
                         break;

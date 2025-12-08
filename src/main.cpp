@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../header/grammar.h"
 #include "../header/logger.h"
+#include "../header/grammarParser.h"
 
 void printProducions(Grammar &g)
 {
@@ -30,6 +31,42 @@ void callFuncions(Grammar g)
 
 int main()
 {
+    string file;
+    string method;
+    cout << "Nome do arquivo com a gramática: ";
+    cin >> file;
+    string path = "data/" + file;
+
+    GrammarParser parser;
+    Grammar grammar = parser.parserFromFile(path);
+
+    static ofstream stream("result.txt");
+    Logger::setStream(&stream);
+
+    while (true)
+    {
+        cout << "Método de normalização: Greibach ou Chomsky? ";
+        cin >> method;
+
+        if (method.compare("Greibach") == 0 || method.compare("greibach") == 0 || method.compare("g") == 0)
+        {
+            // TODO: add greibach
+            break;
+        }
+        else if (method.compare("Chomksy") == 0 || method.compare("chomksy") == 0 || method.compare("c") == 0)
+        {
+            grammar.print(Logger::log());
+            grammar.toChomskyNormalForm();
+            grammar.print(Logger::log());
+            break;
+        }
+        else
+        {
+            cout << "Normalização não disponível, tente novamente. \n";
+        }
+    }
+
+    /*
     ofstream file("grammar.txt");
 
     Grammar g("S", {"a", "b", "c"});
@@ -142,4 +179,5 @@ int main()
 
     callFuncions(g7);
     return 0;
+    */
 }

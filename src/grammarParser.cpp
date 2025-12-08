@@ -38,6 +38,20 @@ Grammar GrammarParser::parserFromFile(string filename)
             complete = true;
         }
 
+        if (ladoEsquerdo == "Alfabeto")
+        {
+            char c;
+            while (ss.get(c))
+            {
+                if (!isspace(c) && c != '=' && c != '&' && c != '}' && c != '{' && c != ',' && c != '\n')
+                {
+                    string st(1, c);
+                    grammar.addTerminal(st);
+                }
+            }
+            complete = true;
+        }
+
         if (seta == "->")
         {
             char c;
