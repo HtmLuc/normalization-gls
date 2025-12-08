@@ -158,6 +158,35 @@ int main() {
     cout << "\nRemovendo regras unitarias: " << endl;
     g6v2.print(cout);
 
+    cout << "-------------------------------------------------------------" << endl;
+
+    Grammar g7("S", { "a", "b", "c"});
+
+    g7.addProduction("S", {"A", "C"});
+    g7.addProduction("S", {"B", "S"});
+    g7.addProduction("S", {"B"});
+    g7.addProduction("A", {"a", "A"});
+    g7.addProduction("A", {"a", "F"});
+    g7.addProduction("B", {"C", "F"});
+    g7.addProduction("B", {"b"});
+    g7.addProduction("C", {"c", "C"});
+    g7.addProduction("C", {"D"});
+    g7.addProduction("D", {"a", "D"});
+    g7.addProduction("D", {"B", "D"});
+    g7.addProduction("D", {"C"});
+    g7.addProduction("E", {"a", "A"});
+    g7.addProduction("E", {"B", "S", "A"});
+    g7.addProduction("F", {"b", "B"});
+    g7.addProduction("F", {"b"});
+
+    cout << "Gramática original:\n";
+    g7.print(cout);
+
+    ChomskyNormalizer normalizer7(g7);
+    Grammar g7v2 = normalizer7.removeUselessSymbols();
+    cout << "\nRemovendo rsímbolos inúteis: " << endl;
+    g7v2.print(cout);
+
 
     return 0;
 }

@@ -78,18 +78,10 @@ vector<int> getNullablePositionsRHS(const vector<string>& rhs, set<string> voida
   vector<int> nullablePositions;
   
   for(int i = 0; i < (int)rhs.size(); i++){
-    //cout << ">>> Componente da producao " << rhs[i] << endl;
     if(voidableVariables.count(rhs[i])){
-      //cout << ">>>> Essa variavel eh anulavel! --> " << rhs[i] << endl;
       nullablePositions.push_back(i);
     }
   }
-  // if(nullablePositions.size() > 0){
-  //   //cout << "\nPosicoes anulaveis da producao: " << endl;
-  // }
-  // for(int pos : nullablePositions){
-  //   cout << pos << endl;
-  // }
 
   return nullablePositions;
 }
@@ -99,11 +91,8 @@ vector<string> generateAuxiliaryRHS(vector<string> rhs, vector<int> nullablePosi
   vector<string> newRhs = rhs;
 
   for (int bit = 0; bit < k; bit++) {
-    //cout << "bit: " << bit << endl;
-    //cout << ((mask >> bit) & 1) << endl;
     if (((mask >> bit) & 1) == 0) {
       int pos = nullablePositions[bit];
-      //cout << "Pos: " << pos << " | nullablePositions[bit]: " << nullablePositions[bit] << " | bit: " << bit << endl;
       newRhs[pos] = "#REMOVE#";
     }
   }
@@ -113,28 +102,20 @@ vector<string> generateAuxiliaryRHS(vector<string> rhs, vector<int> nullablePosi
 
 Grammar ChomskyNormalizer::removeLambdaProductions(){
   Grammar g = this->grammar.clone();
-  //cout << "Inicio" << endl;
 
   set<string> voidableVariables = findVoidableVariables();
   set<string> variables = g.getVariables();
 
   for(string A : g.getVariables()){
-    //cout << "\n\nVariavel analisada:" << A << endl;
+    cout << "\n\nVariavel analisada:" << A << endl;
     set<vector<string>> productionsA = g.getProductions(A);
 
     for(const vector<string>& rhs : productionsA){
-      // cout << "Producao " << A << " --> ";
-      // for(string s : rhs){
-      //    cout << s << " ";
-      // }
-      // cout << endl;
-
       vector<int> nullablePositions = getNullablePositionsRHS(rhs, voidableVariables);
       int k = nullablePositions.size();
       if(k == 0) continue;
 
       int total = 1 << k;
-      //cout << "Total: " << total << endl;
 
       for(int mask = 0; mask < total; mask++){
         vector<string> newRhs = generateAuxiliaryRHS(rhs, nullablePositions, mask);
@@ -242,42 +223,60 @@ Grammar ChomskyNormalizer::removeUnitProductions(){
   return result;
 }
 
-set<string> ChomskyNormalizer::getTerm(){
-  Grammar g = this->grammar.clone();
-    set<string> variables = g.getVariables();
-
+set<string> ChomskyNormalizer::getTerm() {
+    Grammar g = this->grammar.clone();
     set<string> term;
+    cout << "funcao term" << endl;
+
+    // 1. Adiciona variáveis que geram um terminal diretamente
+    for (string A : g.getVariables()) {
+        for (auto prod : g.getProductions(A)) {
+            bool allTerminals = true;
+            for (string s : prod) {
+                if (g.isVariable(s)) {
+                    allTerminals = false;
+                    break;
+                }
+            }
+
+            if(allTerminals){
+                term.insert(A);
+                break;
+            }
+        }
+    }
+
+    cout << "primeira iteracao de term" << endl;
+    for(auto& e : term){
+        cout << e << " " << endl;
+    }
+
     bool changed = true;
 
     while (changed) {
-      changed = false;
-
-    for (const string& A : variables) {
-        if (term.count(A)) continue;
-
-        for (const auto& production : g.getProductions(A)) {
-          bool hasTerminal = false;
-          bool allGood = true;
-
-          for (const auto& symbol : production) {
-            if (!g.isVariable(symbol))
-              hasTerminal = true;
-
-            if (g.isVariable(symbol) && !term.count(symbol))
-              allGood = false;
-          }
-
-          if (hasTerminal && allGood) {
-            term.insert(A);
-            changed = true;
-            break;
-          }
+        changed = false;
+        for (string A : g.getVariables()) {
+            if (term.count(A)) continue; 
+            for (auto prod : g.getProductions(A)) {
+                bool allInTerm = true;
+                for (string s : prod) {
+                    if (g.isVariable(s) && !term.count(s)) {
+                        allInTerm = false;
+                        break;
+                    }
+                }
+                if (allInTerm) {
+                    term.insert(A);
+                    changed = true;
+                    break;
+                }
+            }
         }
-      }
     }
 
     return term;
 }
+
 
 Grammar ChomskyNormalizer::removeUselessSymbols(){
   Grammar g = this->grammar.clone();
