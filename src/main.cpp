@@ -32,7 +32,7 @@ int main()
 {
     ofstream file("grammar.txt");
 
-    Grammar g("S", {"a", "b"});
+    Grammar g("S", {"a", "b", "c"});
 
     g.addProduction("S", {"S"});
     g.addProduction("S", {"A", "B", "C"});

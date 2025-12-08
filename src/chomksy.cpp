@@ -397,6 +397,7 @@ void Grammar::toChomskyNormalForm()
     removeRecursionAtBeginning();
     removeLambdaProductions();
     removeUnitProductions();
+    removeMixedProductions();
     removeUselessSymbols();
     // fixLongProductions();
 }
