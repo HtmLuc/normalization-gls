@@ -114,9 +114,9 @@ int main() {
     g5.print(cout);
 
     ChomskyNormalizer normalizer5(g5);
-    Grammar g5v2 = normalizer5.removeUnitProductions();
+    normalizer5.removeUnitProductions();
     cout << "\nRemovendo regras unitarias: " << endl;
-    g5v2.print(cout);
+    (normalizer5.getGrammar()).print(cout);
 
     cout << "-------------------------------------------------------------" << endl;
 
@@ -132,9 +132,9 @@ int main() {
     g6.print(cout);
 
     ChomskyNormalizer normalizer6(g6);
-    Grammar g6v2 = normalizer5.removeUnitProductions();
+    normalizer6.removeUnitProductions();
     cout << "\nRemovendo regras unitarias: " << endl;
-    g6v2.print(cout);
+    (normalizer6.getGrammar()).print(cout);
 
     cout << "-------------------------------------------------------------" << endl;
 

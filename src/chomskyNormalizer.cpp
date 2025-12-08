@@ -180,7 +180,7 @@ set<string> ChomskyNormalizer::findVariableChain(string& A){
   return chainA;
 }
 
-Grammar ChomskyNormalizer::removeUnitProductions(){
+void ChomskyNormalizer::removeUnitProductions(){
   Grammar g = this->grammar.clone();
   Grammar result = this->grammar.clone();
   set<string> variables = g.getVariables();
@@ -214,7 +214,7 @@ Grammar ChomskyNormalizer::removeUnitProductions(){
     }
   }
 
-  return result;
+  updateGrammar(result);
 }
 
 set<string> ChomskyNormalizer::getTerm() {

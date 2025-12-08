@@ -17,11 +17,12 @@ private:
 public:
     ChomskyNormalizer(const Grammar &g);
     Grammar getGrammar(){return this->grammar;}
+    void updateGrammar(const Grammar &g){this->grammar = g;}
 
     void removeRecursionAtBeginning();
     void removeLambdaProductions();
     set<string> findVoidableVariables();
-    Grammar removeUnitProductions();
+    void removeUnitProductions();
     void removeUselessSymbols();
     Grammar toChomskyNormalForm();
     set<string> findVariableChain(string& A);
