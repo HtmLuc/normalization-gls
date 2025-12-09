@@ -70,5 +70,20 @@ Grammar GrammarParser::parserFromFile(string filename)
             grammar.addProduction(ladoEsquerdo, v);
         }
     }
+
+    auto variables = grammar.getVariables();
+    for (auto &var : variables)
+    {
+        for (auto &prod : grammar.getProductions(var))
+        {
+            for (auto &sym : prod)
+            {
+                if (variables.find(sym) == variables.end() && sym != "&")
+                {
+                    grammar.addTerminal(sym);
+                }
+            }
+        }
+    }
     return grammar;
 }

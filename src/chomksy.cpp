@@ -1,6 +1,7 @@
 
 #include "../header/grammar.h"
 #include "../header/utils.h"
+#include "../header/logger.h"
 #include <queue>
 
 using namespace std;
@@ -10,13 +11,16 @@ void Grammar::fixLongProductions()
     vector<pair<string, vector<string>>> toRemove;
     vector<pair<string, vector<string>>> toAdd;
 
+    Logger::log() << "Remoção de produções longas:\n";
+
     int idx = 1;
 
     for (auto A : this->getVariables())
     {
         for (auto prod : this->getProductions(A))
         {
-            if (prod.size() <= 2)
+            int size = prod.size();
+            if (size <= 2)
                 continue;
 
             toRemove.push_back({A, prod});
@@ -29,21 +33,23 @@ void Grammar::fixLongProductions()
             vector<string> rhs = {prod[0], new_lhs};
             toAdd.push_back({A, rhs});
 
-            for (int i = 0; i < prod.size() - 2; i++)
+            for (int i = 1; i < size - 2; ++i)
             {
                 string next_lhs = "M_";
                 suffix = to_string(idx);
                 next_lhs.append(suffix);
                 idx++;
 
-                rhs = {prod[i + 1], next_lhs};
-                toAdd.push_back({next_lhs, rhs});
+                rhs = {prod[i], next_lhs};
+                toAdd.push_back({new_lhs, rhs});
+                new_lhs = next_lhs;
             }
 
-            rhs = {prod[prod.size() - 2], prod.back()};
+            rhs = {prod[size - 2], prod[size - 1]};
             toAdd.push_back({new_lhs, rhs});
         }
     }
+
     for (auto &rm : toRemove)
     {
         this->removeProduction(rm.first, rm.second);
@@ -53,6 +59,7 @@ void Grammar::fixLongProductions()
     {
         this->addProduction(add.first, add.second);
     }
+    this->print(Logger::log());
 }
 
 void Grammar::removeMixedProductions()
@@ -60,6 +67,8 @@ void Grammar::removeMixedProductions()
     map<string, string> newVariables;
     set<pair<string, vector<string>>> toRemove;
     set<pair<string, vector<string>>> toAdd;
+
+    Logger::log() << "Realizando a remoção de produções mistas. \n";
 
     int idx = 1;
     for (auto sym : this->getTerminals())
@@ -103,10 +112,12 @@ void Grammar::removeMixedProductions()
     {
         this->addProduction(add.first, add.second);
     }
+    this->print(Logger::log());
 }
 
 void Grammar::removeRecursionAtBeginning()
 {
+    Logger::log() << "Remoção de recursão na variável inicial." << ".\n";
     string S = this->getStartSymbol();
     set<vector<string>> productionsS = this->getProductions(S);
 
@@ -122,12 +133,14 @@ void Grammar::removeRecursionAtBeginning()
             }
         }
     }
+    this->print(Logger::log());
 }
 
 set<string> Grammar::findVoidableVariables()
 {
     set<string> voidableVariables;
     bool changed = true;
+    Logger::log() << "Encontrando variáveis anuláveis." << ".\n";
 
     for (string variable : this->getVariables())
     {
@@ -181,6 +194,12 @@ set<string> Grammar::findVoidableVariables()
         }
     }
 
+    Logger::log() << "Variáveis anuláveis encontradas:";
+    for (string s : voidableVariables)
+    {
+        Logger::log() << s << " ";
+    }
+    Logger::log() << ".\n";
     return voidableVariables;
 }
 
@@ -188,6 +207,7 @@ void Grammar::removeLambdaProductions()
 {
     set<string> voidableVariables = findVoidableVariables();
     set<string> variables = this->getVariables();
+    Logger::log() << "Removendo produções-lambda." << ".\n";
 
     for (string A : this->getVariables())
     {
@@ -231,11 +251,11 @@ void Grammar::removeLambdaProductions()
     {
         this->addProduction(S, {"&"});
     }
+    this->print(Logger::log());
 }
 
 set<string> Grammar::findUnitProductionsVar(string &A)
 {
-    // TODO: remove this
     Grammar g = this->clone();
     set<vector<string>> productionsA = g.getProductions(A);
     set<string> unitProductionsA;
@@ -281,11 +301,19 @@ set<string> Grammar::findVariableChain(string &A)
         }
     } while (chainA != prev);
 
+    Logger::log() << "'Chain' de " << A << ": ";
+    for (string s : chainA)
+    {
+        Logger::log() << s << " ";
+    }
+    Logger::log() << ".\n";
     return chainA;
 }
 
 void Grammar::removeUnitProductions()
 {
+
+    Logger::log() << "Remoção de produções unitárias: \n";
     for (string A : this->getVariables())
     {
         set<string> unitProductionsA = findUnitProductionsVar(A);
@@ -323,6 +351,7 @@ void Grammar::removeUnitProductions()
             this->removeProduction(A, prod);
         }
     }
+    this->print(Logger::log());
 }
 
 set<string> Grammar::getTerm()
@@ -381,6 +410,13 @@ set<string> Grammar::getTerm()
         }
     }
 
+    Logger::log() << "Variáveis do conjunto 'Term': ";
+    for (string s : term)
+    {
+        Logger::log() << s << " ";
+    }
+    Logger::log() << ".\n";
+
     return term;
 }
 
@@ -412,6 +448,12 @@ set<string> Grammar::getReach()
         }
     }
 
+    Logger::log() << "Variáveis alcançáveis a partir da variável inicial: ";
+    for (string s : reach)
+    {
+        Logger::log() << s << " ";
+    }
+    Logger::log() << ".\n";
     return reach;
 }
 
@@ -419,6 +461,8 @@ void Grammar::removeUselessSymbols()
 {
     set<string> variables = this->getVariables();
     set<string> term = getTerm();
+
+    Logger::log() << "Remoção de símbolos inúteis:" << ".\n";
 
     for (string A : variables)
     {
@@ -437,13 +481,16 @@ void Grammar::removeUselessSymbols()
             this->removeVariable(A);
         }
     }
+
+    this->print(Logger::log());
 }
 
 void Grammar::toChomskyNormalForm()
 {
+    removeRecursionAtBeginning();
     removeLambdaProductions();
-    removeMixedProductions();
-    removeUselessSymbols();
     removeUnitProductions();
+    removeUselessSymbols();
+    removeMixedProductions();
     fixLongProductions();
 }

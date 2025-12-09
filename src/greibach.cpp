@@ -310,7 +310,7 @@ void Grammar::replaceRecursiveVariables()
 
 void Grammar::toGreibachNormalForm()
 {
-    // this->toChomskyNormalForm();
+    this->toChomskyNormalForm();
     this->print(Logger::log());
 
     Logger::log() << "Iniciando a normalização para Forma Normal de Greibach!\n";
