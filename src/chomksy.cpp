@@ -155,11 +155,11 @@ void Grammar::removeRecursionAtBeginning()
                 Logger::log() << "Removendo recursão na variável inicial. \n";
                 this->setStartSymbol("S'");
                 this->addProduction("S'", {"S"});
+                this->print(Logger::log());
                 break;
             }
         }
     }
-    this->print(Logger::log());
 }
 
 set<string> Grammar::findVoidableVariables()
@@ -527,6 +527,7 @@ void Grammar::removeUselessVariables()
 
 void Grammar::toChomskyNormalForm()
 {
+    this->print(Logger::log());
     removeRecursionAtBeginning();
     removeLambdaProductions();
     removeUnitProductions();

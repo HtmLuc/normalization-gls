@@ -30,9 +30,7 @@ int main()
         }
         else if (method.compare("Chomksy") == 0 || method.compare("chomksy") == 0 || method.compare("c") == 0)
         {
-            grammar.print(Logger::log());
             grammar.toChomskyNormalForm();
-            grammar.print(Logger::log());
             break;
         }
         else
