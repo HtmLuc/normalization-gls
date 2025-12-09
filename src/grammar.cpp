@@ -63,8 +63,11 @@ void Grammar::removeVariable(const string &A)
 
 void Grammar::addProduction(string A, vector<string> rhs)
 {
-    productions[A].insert(rhs);
-    this->addVariable(A);
+    if (this->variables.count(A) == 0)
+    {
+        this->addVariable(A);
+    }
+    this->productions[A].insert(rhs);
 }
 
 void Grammar::addVariable(string A)
@@ -75,10 +78,10 @@ void Grammar::addVariable(string A)
 void Grammar::removeProduction(string A, vector<string> rhs)
 {
     productions[A].erase(rhs);
-    if (productions[A].empty())
-    {
-        productions.erase(A);
-    }
+    // if (productions[A].empty())
+    // {
+    //     productions.erase(A);
+    // }
 }
 
 void Grammar::clearProductions(string A)

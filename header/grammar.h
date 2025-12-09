@@ -25,7 +25,7 @@ private:
     void replace(string lhs, string vRhs);
     void replaceBackwards();
     void applyRuleOrderConstraint();
-    void removeLeftRecursionGreibach(string lhs);
+    string removeLeftRecursion(string lhs);
 
     /// @brief Remove todas as produções que intercalam terminais e variáveis, i.e. S -> aBa,
     /// adicionando estados para cada variável.
@@ -36,6 +36,7 @@ private:
     void removeLambdaProductions();
     void removeUnitProductions();
     void removeUselessSymbols();
+    void replaceRecursiveVariables();
     set<string> findVariableChain(string &A);
     set<string> findUnitProductionsVar(string &A);
     set<string> getTerm();

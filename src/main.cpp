@@ -42,6 +42,7 @@ int main()
 
     static ofstream stream("result.txt");
     Logger::setStream(&stream);
+    // Logger::setStream(&cout);
 
     while (true)
     {
@@ -50,7 +51,7 @@ int main()
 
         if (method.compare("Greibach") == 0 || method.compare("greibach") == 0 || method.compare("g") == 0)
         {
-            // TODO: add greibach
+            grammar.toGreibachNormalForm();
             break;
         }
         else if (method.compare("Chomksy") == 0 || method.compare("chomksy") == 0 || method.compare("c") == 0)

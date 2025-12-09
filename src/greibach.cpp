@@ -2,6 +2,7 @@
 #include "../header/logger.h"
 #include "../header/utils.h"
 
+// TODO: mudar nome desse método
 void Grammar::renameVariables()
 {
     this->next_order = 2;
@@ -45,100 +46,116 @@ bool Grammar::respectGreibachOrder()
     return true;
 }
 
-void Grammar::removeLeftRecursionGreibach(string lhs)
+string Grammar::removeLeftRecursion(string lhs)
 {
-    Logger::log() << "Faremos a remoção das regras com recursão à esquerda em " << lhs << ".\n";
-    set<vector<string>> productionsA = this->getProductions(lhs);
-    vector<vector<string>> recursive;
-    vector<vector<string>> non_recursive;
+    // 1. Obter uma CÓPIA das produções atuais para evitar erro de iterador
+    set<vector<string>> current_productions = this->getProductions(lhs);
+
+    vector<vector<string>> recursive_alphas;
+    vector<vector<string>> non_recursive_betas;
     string new_lhs = lhs + "'";
 
-    // Divide as regras entre recursivas e não recursivas
-    for (auto &prod : productionsA)
+    // 2. Classificação das Regras (Bufferizar)
+    for (const auto &prod : current_productions)
     {
-        auto symbol = prod.front();
-        if (symbol == lhs)
+        if (!prod.empty() && prod.front() == lhs)
         {
-            vector<string> beta(prod.begin() + 1, prod.end());
-            recursive.push_back(beta);
+            // A -> A alpha
+            vector<string> alpha(prod.begin() + 1, prod.end());
+            recursive_alphas.push_back(alpha);
         }
         else
         {
-            non_recursive.push_back(prod);
+            // A -> beta
+            non_recursive_betas.push_back(prod);
         }
     }
 
-    if (!recursive.empty())
+    // Só transformamos se houver recursão à esquerda detectada
+    if (!recursive_alphas.empty())
     {
-        // Remove todas as regras pra depois adicionar novamente, evitando mexer
+        // 3. Modificação da Gramática Original (Limpando as regras antigas)
         this->clearProductions(lhs);
+
+        // 4. Registrar a nova variável no set interno (Garante que isVariable funcione)
         this->addVariable(new_lhs);
-        this->order[new_lhs] = this->next_order++;
-        this->variables.insert(new_lhs);
 
-        Logger::log() << "Nova variável introduzida: " << new_lhs << "\n";
-
-        // Criar agora as regras recursivas
-        for (auto beta : recursive)
+        // 5. Criar regras para a nova variável: A' -> alpha | alpha A'
+        for (const auto &alpha : recursive_alphas)
         {
-            this->addProduction(new_lhs, beta); // A' -> B
-            vector<string> betaB = beta;
-            betaB.push_back(new_lhs);
-            this->addProduction(new_lhs, betaB); // A' -> B | BA'
+            this->addProduction(new_lhs, alpha); // A' -> alpha
+
+            vector<string> alpha_with_prime = alpha;
+            alpha_with_prime.push_back(new_lhs);
+            this->addProduction(new_lhs, alpha_with_prime); // A' -> alpha A'
         }
 
-        // Adicionar as regras não recursivas
-        for (auto og : non_recursive)
+        // 6. Atualizar as regras da variável original: A -> beta | beta A'
+        for (const auto &beta : non_recursive_betas)
         {
-            this->addProduction(lhs, og); // A -> a
+            this->addProduction(lhs, beta); // A -> beta (mantém a original limpa)
 
-            vector<string> ogRec = og;
-            ogRec.push_back(new_lhs);
-            this->addProduction(lhs, ogRec); // A -> a | aA'
+            vector<string> beta_with_prime = beta;
+            beta_with_prime.push_back(new_lhs);
+            this->addProduction(lhs, beta_with_prime); // A -> beta A'
         }
 
-        Logger::log() << "Atualizada numeração das variáveis da gramática. \n";
-
-        auto sorted = getSortedVariables(order);
-        for (auto v : sorted)
-        {
-            Logger::log() << v << ": " << order[v] << "\n";
-        }
+        return new_lhs; // Retorna para que o chamador gerencie a ordem (Greibach)
     }
 
-    this->print(Logger::log());
+    return ""; // Nenhuma variável nova criada
 }
 
 void Grammar::applyRuleOrderConstraint()
 {
-    this->print(Logger::log());
+    // 1. Fixar a ordem: Criamos um vetor estável.
+    // O algoritmo de Greibach exige processar de V1 até Vn na ordem numérica.
+    auto sorted = getSortedVariables(order);
 
-    while (!this->respectGreibachOrder())
+    // 2. Loop de Recursão à Esquerda e Substituição Direta (Passo 1 a n)
+    for (size_t k_idx = 0; k_idx < sorted.size(); ++k_idx)
     {
-        Logger::log() << "======================================================\n";
-        Logger::log() << "Gramática ainda não está na Forma Normal de Greibach. \n";
-        // Analisaremos cada regra de cada variável para ver se está no padrão.
+        string k = sorted[k_idx];
+        bool changed = true;
 
-        auto sorted = getSortedVariables(order);
-
-        for (auto k : sorted)
+        // Reanalisamos a variável 'k' até que ela esteja limpa
+        while (changed)
         {
-            for (auto p : this->getProductions(k))
+            changed = false;
+            // COPIA LOCAL: Essencial para evitar Segmentation Fault
+            auto productionsK = this->getProductions(k);
+
+            for (auto p : productionsK)
             {
-                string j = p.front();
-                // Se começa com terminal ou se a regra Ak -> Aj tem j > k,
-                // já está seguindo a ordem.
-                if (!this->isVariable(j) || order[j] > order[k])
-                {
+                if (p.empty())
                     continue;
-                }
-                else if (order[j] < order[k])
+                string j = p.front();
+
+                if (this->isVariable(j))
                 {
-                    this->replace(k, j);
-                }
-                else
-                { // Aplica remoção de recursão à esquerda
-                    this->removeLeftRecursionGreibach(k);
+                    int oJ = order[j];
+                    int oK = order[k];
+
+                    if (oJ < oK)
+                    {
+                        // j < k: Substituição direta
+                        this->replace(k, j);
+                        changed = true;
+                        break; // Sai do for para re-iterar com as novas produções de k
+                    }
+                    else if (oJ == oK)
+                    {
+                        // j == k: Recursão Direta
+                        string newVar = this->removeLeftRecursion(k);
+
+                        // Atualiza as estruturas de ordem com a nova variável
+                        this->order[newVar] = this->next_order++;
+                        this->variables.insert(newVar);
+
+                        // Recursão direta resolvida para k, sai para a próxima variável
+                        changed = false;
+                        break;
+                    }
                 }
             }
         }
@@ -170,8 +187,12 @@ void Grammar::replace(string lhs, string vRhs)
             // para cada regra de A_j, adicionamos em A_k seguido do beta
             for (const auto &replacer_rhs : replacer_productions)
             {
-                vector<string> new_rhs = replacer_rhs;
+                vector<string> new_rhs;
+                new_rhs.reserve(replacer_rhs.size() + beta.size());
+
+                new_rhs.insert(new_rhs.end(), replacer_rhs.begin(), replacer_rhs.end());
                 new_rhs.insert(new_rhs.end(), beta.begin(), beta.end());
+
                 to_add.insert(new_rhs);
             }
         }
@@ -186,35 +207,116 @@ void Grammar::replace(string lhs, string vRhs)
     this->print(Logger::log());
 }
 
-// TODO: adicionar logs aqui tbm
+// void Grammar::replaceBackwards()
+// {
+//     Logger::log() << "Faremos a substituição nas produções que não estão normalizadas.";
+//     auto variables = getSortedVariables(order);
+
+//     for (auto v = variables.rbegin(); v != variables.rend(); v++)
+//     {
+//         for (auto p : this->getProductions(*v))
+//         {
+//             string j = p.front();
+//             string k = *v;
+
+//             if (!this->isVariable(j))
+//             {
+//                 continue;
+//             }
+//             else if (order[j] > order[k])
+//             {
+//                 this->replace(k, j); // Forçar com que todas as regras de k que iniciam com j iniciem com terminais
+//             }
+//         }
+//     }
+//     this->print(Logger::log());
+// }
 void Grammar::replaceBackwards()
 {
-    auto variables = getSortedVariables(order);
+    Logger::log() << "Iniciando a substituição reversa das produções. \n";
 
-    for (auto v = variables.rbegin(); v != variables.rend(); v++)
+    auto sorted = getSortedVariables(order);
+
+    for (int i = sorted.size() - 2; i >= 0; --i)
     {
-        for (auto p : this->getProductions(*v))
-        {
-            string j = p.front();
-            string k = *v;
+        string k = sorted[i];
+        bool changed = true;
 
-            if (!this->isVariable(j))
+        while (changed)
+        {
+            changed = false;
+            auto prodK = this->getProductions(k);
+
+            for (const auto &p : prodK)
             {
-                continue;
-            }
-            else if (order[j] > order[k])
-            {
-                this->replace(k, j); // Forçar com que todas as regras de k que iniciam com j iniciem com terminais
+                if (p.empty())
+                {
+                    continue;
+                }
+
+                string j = p.front();
+
+                if (this->isVariable(j) && order[j] > order[k])
+                {
+                    this->replace(k, j);
+                    changed = true;
+                    break;
+                }
             }
         }
     }
+    this->print(Logger::log());
+}
+
+void Grammar::replaceRecursiveVariables()
+{
+    Logger::log() << "Iniciando a substituição nas variáveis recursivas. \n";
+
+    auto sorted = getSortedVariables(order);
+    vector<string> recursiveVars;
+
+    for (auto v : this->getVariables())
+    {
+        if (v[v.length() - 1] == '\'')
+        {
+            recursiveVars.push_back(v);
+        }
+    }
+
+    for (auto rv : recursiveVars)
+    {
+        bool changed = true;
+        while (changed)
+        {
+            changed = false;
+
+            auto rvProd = this->getProductions(rv);
+            for (auto rvProdVec : rvProd)
+            {
+                string k = rvProdVec.front();
+
+                if (this->isVariable(k))
+                {
+                    this->replace(rv, k);
+                    changed = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    this->print(Logger::log());
 }
 
 void Grammar::toGreibachNormalForm()
 {
+    // this->toChomskyNormalForm();
+    this->print(Logger::log());
+
     Logger::log() << "Iniciando a normalização para Forma Normal de Greibach!\n";
     this->renameVariables();
     this->applyRuleOrderConstraint();
     this->replaceBackwards();
-    // Step 4 não parece mais necessário agora...
+    this->replaceRecursiveVariables();
+    Logger::log() << "Gramática agora está na Forma Normal de Greibach!\n";
 }
