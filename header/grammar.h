@@ -97,7 +97,7 @@ private:
 
     /// @brief Função que remove variáveis inúteis (inalcançáveis ou não-geradoras) da gramática.
     /// Configura-se como o 4º passo do algoritmo para a Forma Normal de Chomksy.
-    void removeUselessSymbols();
+    void removeUselessVariables();
 
     /// @brief Função que remove todas as produções que intercalam terminais e variáveis, i.e. S -> aBa,
     /// adicionando uma nova produção composta somente por variáveis.

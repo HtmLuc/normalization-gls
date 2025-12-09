@@ -17,7 +17,7 @@ void Grammar::orderVariables()
     }
 
     Logger::log() << "===============================================\n";
-    Logger::log() << "Numerando em ordem as variáveis da gramática. \n";
+    Logger::log() << "Numerando em ordem as variáveis da gramática... \n";
     auto sorted = getSortedVariables(this->order);
 
     for (auto v : sorted)
@@ -80,8 +80,8 @@ void Grammar::applyRuleOrderConstraint()
 {
     auto sorted = getSortedVariables(order);
 
-    Logger::log() << "==================================================\n";
-    Logger::log() << "Iniciando a ordenação das produções da gramática. \n";
+    Logger::log() << "====================================================\n";
+    Logger::log() << "Iniciando a ordenação das produções da gramática... \n";
 
     for (int k_idx = 0; k_idx < sorted.size(); k_idx++)
     {
@@ -129,7 +129,7 @@ void Grammar::applyRuleOrderConstraint()
 
 void Grammar::replace(string lhs, string vRhs)
 {
-    Logger::log() << "Faremos a substituição de " << vRhs << " em " << lhs << ".\n";
+    Logger::log() << "- Faremos a substituição de " << vRhs << " em " << lhs << ".\n";
     set<vector<string>> to_remove;
     set<vector<string>> to_add;
 
@@ -174,7 +174,7 @@ void Grammar::replace(string lhs, string vRhs)
 void Grammar::replaceBackwards()
 {
     Logger::log() << "================================================\n";
-    Logger::log() << "Iniciando a substituição reversa das produções. \n";
+    Logger::log() << "Iniciando a substituição reversa das produções... \n";
 
     auto sorted = getSortedVariables(order);
 
@@ -256,7 +256,6 @@ void Grammar::replaceRecursiveVariables()
 void Grammar::toGreibachNormalForm()
 {
     this->toChomskyNormalForm();
-    this->print(Logger::log());
 
     Logger::log() << "Iniciando a normalização da Gramática para a Forma Normal de Greibach!\n";
     this->orderVariables();
