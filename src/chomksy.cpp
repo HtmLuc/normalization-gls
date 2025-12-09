@@ -10,7 +10,7 @@ void Grammar::fixLongProductions() {
     vector<pair<string, vector<string>>> toRemove;
     vector<pair<string, vector<string>>> toAdd;
 
-    Logger::log() << "Remoção de produções longas:" << ".\n";
+    Logger::log() << "Remoção de produções longas:\n";
 
     int idx = 1;
 
@@ -18,7 +18,8 @@ void Grammar::fixLongProductions() {
     {
         for (auto prod : this->getProductions(A))
         {
-            if (prod.size() <= 2) continue;
+            int size = prod.size();
+            if (size <= 2) continue;
 
             toRemove.push_back({A, prod});
 
@@ -30,28 +31,28 @@ void Grammar::fixLongProductions() {
             vector<string> rhs = { prod[0], new_lhs };
             toAdd.push_back({A, rhs});
 
-            for (int i = 0; i < (int)prod.size() - 2; i++ )
+            for (int i = 1; i < size - 2; ++i)
             {
                 string next_lhs = "M_";
                 suffix = to_string(idx);
                 next_lhs.append(suffix);
                 idx++;
 
-                rhs = { prod[i + 1], next_lhs };
-                toAdd.push_back({next_lhs, rhs});
+                rhs = { prod[i], next_lhs };
+                toAdd.push_back({new_lhs, rhs});
+                new_lhs = next_lhs;
             }
 
-            rhs = { prod[prod.size() - 2], prod.back() };
+            rhs = { prod[size - 2], prod[size - 1] };
             toAdd.push_back({new_lhs, rhs});
         }
     }
-    for (auto& rm : toRemove)
-    {
+
+    for (auto &rm : toRemove) {
         this->removeProduction(rm.first, rm.second);
     }
 
-    for (auto& add : toAdd)
-    {
+    for (auto &add : toAdd) {
         this->addProduction(add.first, add.second);
     }
     this->print(Logger::log());
