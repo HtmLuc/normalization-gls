@@ -26,26 +26,6 @@ void Grammar::orderVariables()
     }
 }
 
-bool Grammar::respectGreibachOrder()
-{
-    for (auto k : this->variables)
-    {
-        for (vector<string> p : this->getProductions(k))
-        {
-            string first_var = p.front();
-
-            if (this->isVariable(first_var))
-            {
-                if (order[first_var] <= order[k])
-                {
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
-}
-
 string Grammar::removeLeftRecursion(string lhs)
 {
     auto productions = this->getProductions(lhs);
