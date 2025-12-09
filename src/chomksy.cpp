@@ -11,6 +11,8 @@ void Grammar::fixLongProductions()
     vector<pair<string, vector<string>>> toRemove;
     vector<pair<string, vector<string>>> toAdd;
 
+    map<vector<string>, string> existingProductions;
+
     Logger::log() << "Remoção de produções longas:\n";
 
     int idx = 1;
@@ -25,28 +27,39 @@ void Grammar::fixLongProductions()
 
             toRemove.push_back({A, prod});
 
-            string new_lhs = "M_";
-            string suffix = to_string(idx);
-            new_lhs.append(suffix);
-            idx++;
+            string last = prod[size - 1];
+            string secondLast = prod[size - 2];
+            vector<string> rhs = {secondLast, last};
 
-            vector<string> rhs = {prod[0], new_lhs};
-            toAdd.push_back({A, rhs});
+            string currentLhs;
 
-            for (int i = 1; i < size - 2; ++i)
-            {
-                string next_lhs = "M_";
-                suffix = to_string(idx);
-                next_lhs.append(suffix);
-                idx++;
-
-                rhs = {prod[i], next_lhs};
-                toAdd.push_back({new_lhs, rhs});
-                new_lhs = next_lhs;
+            if (existingProductions.find(rhs) != existingProductions.end()) {
+                currentLhs = existingProductions[rhs];
+            } else {
+                currentLhs = "M_" + to_string(idx++);
+                existingProductions[rhs] = currentLhs;
+                toAdd.push_back({currentLhs, rhs});
             }
 
-            rhs = {prod[size - 2], prod[size - 1]};
-            toAdd.push_back({new_lhs, rhs});
+            for (int i = size - 3; i >= 0; --i)
+            {
+                string val = prod[i];
+                rhs = {val, currentLhs};
+
+                if (i == 0) {
+                    toAdd.push_back({A, rhs});
+                }
+                else {
+                    if (existingProductions.find(rhs) != existingProductions.end()) {
+                        currentLhs = existingProductions[rhs];
+                    } else {
+                        string newM = "M_" + to_string(idx++);
+                        existingProductions[rhs] = newM;
+                        toAdd.push_back({newM, rhs});
+                        currentLhs = newM;
+                    }
+                }
+            }
         }
     }
 
