@@ -14,13 +14,13 @@ class Grammar
 private:
     set<string> terminals;
     set<string> variables;
-    unordered_map<string, int> order; // Para marcar a ordem de cada vértice
-    int next_order;                   // FIXME: temp?
+    unordered_map<string, int> order;
+    int nextOrder;
     string startSymbol;
     map<string, set<vector<string>>> productions;
 
     // GREIBACH
-    void renameVariables();
+    void orderVariables();
     bool respectGreibachOrder();
     void replace(string lhs, string vRhs);
     void replaceBackwards();
