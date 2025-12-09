@@ -1,5 +1,5 @@
-#ifndef NORMALIZATION_GLS_GRAMMARPARSER_H
-#define NORMALIZATION_GLS_GRAMMARPARSER_H
+#ifndef GRAMMAR_PARSER_H
+#define GRAMMAR_PARSER_H
 
 #include <iostream>
 #include <fstream>

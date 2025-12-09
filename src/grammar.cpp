@@ -78,10 +78,6 @@ void Grammar::addVariable(string A)
 void Grammar::removeProduction(string A, vector<string> rhs)
 {
     productions[A].erase(rhs);
-    // if (productions[A].empty())
-    // {
-    //     productions.erase(A);
-    // }
 }
 
 void Grammar::clearProductions(string A)

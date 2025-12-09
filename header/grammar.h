@@ -1,5 +1,5 @@
-#ifndef GRAMMAR_HPP
-#define GRAMMAR_HPP
+#ifndef GRAMMAR_H
+#define GRAMMAR_H
 
 #include <iostream>
 #include <set>
