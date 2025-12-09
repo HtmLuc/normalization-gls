@@ -60,4 +60,4 @@ inline vector<string> generateAuxiliaryRHS(vector<string> rhs, vector<int> nulla
 
     return newRhs;
 }
-#endif // !1
+#endif // !UTILS_H
